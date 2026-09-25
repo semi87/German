@@ -7,15 +7,15 @@ A free, compact German grammar reference, published with GitHub Pages.
 ## Topics
 
 - **Basics** — alphabet & pronunciation, nouns & gender, articles, the four cases, pronouns
-- **Verbs** — present tense, modal verbs, separable verbs, imperative
-- **Tenses** — Perfekt, Präteritum & Plusquamperfekt, Futur I & II
-- **Sentences** — word order, negation, questions, conjunctions, relative clauses
-- **Words** — prepositions, adjective endings, comparison, numbers/time/dates
-- **Advanced** — Konjunktiv II, passive voice, infinitive with *zu*
+- **Verbs** — present tense, modal verbs, separable verbs, imperative, reflexive verbs, verbs with prepositions, *lassen*, modal verbs in the past
+- **Tenses** — Perfekt, Präteritum & Plusquamperfekt, Futur I & II, tense overview
+- **Sentences** — word order, negation, questions, conjunctions, relative clauses, two-part conjunctions, the word *es*
+- **Words** — prepositions, adjective endings, comparison, numbers/time/dates, indefinite pronouns, modal particles, *hin*/*her*, time expressions, word formation
+- **Advanced** — Konjunktiv II, passive voice, infinitive with *zu*, adjectives as nouns, participles as adjectives, indirect speech (Konjunktiv I), modal verbs for assumptions
 - **Practice Trainer** — endless random drills: der/die/das, plurals, verb forms, English → German, and a grammar mix drawn from every topic's exercises
 - **Wörterbuch** — a searchable German–English dictionary (~590 everyday words) with gender, plurals, verb forms, pronunciation and flashcards
 
-Each topic has tables, a “More examples” block and two sets of interactive exercises (43 in total). The site has search (press `/`), dark mode and works on mobile.
+Each topic has tables, a “More examples” block and two sets of interactive exercises (59 in total). The site has search (press `/`), dark mode and works on mobile.
 
 ## Structure
 
