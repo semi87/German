@@ -6,7 +6,7 @@ A free, compact German grammar reference, published with GitHub Pages.
 
 ## Topics
 
-- **Basics** — alphabet & pronunciation, nouns & gender, articles, the four cases, Akkusativ in depth, pronouns
+- **Basics** — alphabet & pronunciation, nouns & gender, articles, the four cases, Akkusativ / Dativ / Genitiv in depth, pronouns
 - **Verbs** — present tense, modal verbs, separable verbs, imperative, reflexive verbs, verbs with prepositions, *lassen*, modal verbs in the past
 - **Tenses** — Perfekt, Präteritum & Plusquamperfekt, Futur I & II, tense overview
 - **Sentences** — word order, negation, questions, conjunctions, relative clauses, two-part conjunctions, the word *es*
@@ -15,7 +15,7 @@ A free, compact German grammar reference, published with GitHub Pages.
 - **Practice Trainer** — endless random drills: der/die/das, plurals, verb forms, English → German, and a grammar mix drawn from every topic's exercises
 - **Wörterbuch** — a searchable German–English dictionary (~590 everyday words) with gender, plurals, verb forms, pronunciation and flashcards
 
-Each topic has tables, a “Common mistakes” block (✗ wrong → ✓ right, with the reason), a “More examples” block and interactive exercises (62 sets in total); the hardest topics also have an “In detail” step-by-step explanation. The site has search (press `/`), dark mode and works on mobile.
+Each topic has tables, a “Common mistakes” block (✗ wrong → ✓ right, with the reason), a “More examples” block and interactive exercises (67 sets in total); the hardest topics also have an “In detail” step-by-step explanation. The site has search (press `/`), dark mode and works on mobile.
 
 ## Structure
 
