@@ -14,11 +14,12 @@
   <button id="menuBtn" class="icon-btn" type="button" aria-label="Toggle menu">☰</button>
   <a class="brand" href="#home">
     <span class="flag" aria-hidden="true"><span></span><span></span><span></span></span>
-    Deutsche Grammatik
+    <span class="brand-text">Deutsche Grammatik</span>
   </a>
   <span class="spacer"></span>
   <a class="icon-btn toplink" href="#practice">Practice</a>
   <a class="icon-btn toplink" href="#dictionary">Wörterbuch</a>
+  <a class="icon-btn notes-link" href="#notes" aria-label="My notes">📝<span class="notes-link-label"> Notes</span><span id="notesCount" class="notes-badge"></span></a>
   <button id="themeBtn" class="icon-btn" type="button" aria-label="Toggle dark mode">◐</button>
 </header>
 
@@ -3993,6 +3994,41 @@
   </div>
 </section>
 
+<!-- ================================================================ NOTES -->
+<section class="topic" id="notes" data-title="My Notes" data-group="My Notes"
+  data-desc="Your personal notebook: notes on every topic, saved in your browser, with export and backup.">
+  <h1>📝 My Notes</h1>
+  <p class="subtitle">Everything you've written, in one place. Notes are saved automatically <b>in this browser</b> — they stay private to you and are still here next time you visit.</p>
+
+  <div class="grid">
+    <div class="card"><h4>Notes on a topic</h4><p>Open any topic and scroll to <b>📝 My notes</b> at the bottom of the page.</p></div>
+    <div class="card"><h4>Comment on a section or word</h4><p>Click <b>💬</b> next to any heading in a topic, or next to any word in the <a href="#dictionary">Wörterbuch</a>.</p></div>
+    <div class="card"><h4>Quote from the page</h4><p>Select any text in a topic and click <b>+ Add to notes</b> to copy it into that topic's notes.</p></div>
+    <div class="card"><h4>Keep them safe</h4><p>Notes live only in this browser. Use <b>Backup</b> to save a file, and <b>Restore</b> to load it on another device.</p></div>
+  </div>
+
+  <h2>General notebook</h2>
+  <div id="notesGeneral"></div>
+
+  <h2>All notes &amp; comments</h2>
+  <div class="notes-toolbar">
+    <input id="notesSearch" class="search" type="search" placeholder="Search your notes…" aria-label="Search your notes">
+    <span id="notesSummary" class="hint"></span>
+  </div>
+  <div id="notesList" class="notes-list"></div>
+  <p id="notesEmpty" class="hint">Nothing here yet. Open a topic and write in <b>📝 My notes</b> at the bottom, click <b>💬</b> next to a heading or a dictionary word, or select text on a page and click <b>+ Add to notes</b>.</p>
+
+  <h2>Export &amp; backup</h2>
+  <div class="quiz-actions notes-actions">
+    <button id="notesExport" class="btn" type="button">Download as text (.txt)</button>
+    <button id="notesBackup" class="btn secondary" type="button">Backup (.json)</button>
+    <button id="notesRestore" class="btn secondary" type="button">Restore from backup</button>
+    <button id="notesClear" class="btn secondary danger" type="button">Delete all notes</button>
+    <input id="notesFile" type="file" accept=".json,application/json" hidden>
+  </div>
+  <p class="hint">The text file is easy to read, print or paste into another app. The backup file can be restored here — restoring adds to your current notes and never deletes anything.</p>
+</section>
+
 <footer class="site-footer">
   Deutsche Grammatik — a free, open-source reference. Found a mistake? Open an issue on
   <a href="https://github.com/semi87/German">GitHub</a>.
@@ -4001,8 +4037,10 @@
   </main>
 </div>
 
+<script src="assets/store.js"></script>
 <script src="assets/dictionary.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/practice.js"></script>
+<script src="assets/notes.js"></script>
 </body>
 </html>

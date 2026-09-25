@@ -13,6 +13,7 @@ A free, compact German grammar reference, published with GitHub Pages.
 - **Words** — prepositions, adjective endings, comparison, numbers/time/dates, indefinite pronouns, modal particles, *hin*/*her*, time expressions, word formation
 - **Advanced** — Konjunktiv II, passive voice, infinitive with *zu*, adjectives as nouns, participles as adjectives, indirect speech (Konjunktiv I), modal verbs for assumptions
 - **Practice Trainer** — endless random drills: der/die/das, plurals, verb forms, English → German, and a grammar mix drawn from every topic's exercises
+- **My Notes** — personal notes on every topic (select text → “+ Add to notes”), 💬 comments on any section heading or dictionary word, a general notebook, search, export as .txt, backup/restore as .json; saved in the browser (localStorage)
 - **Wörterbuch** — a searchable German–English dictionary (~590 everyday words) with gender, plurals, verb forms, pronunciation and flashcards
 
 Each topic has tables, a “Common mistakes” block (✗ wrong → ✓ right, with the reason), a “More examples” block and interactive exercises (67 sets in total); the hardest topics also have an “In detail” step-by-step explanation. The site has search (press `/`), dark mode and works on mobile.
@@ -27,6 +28,8 @@ assets/style.css    styles, light/dark theme
 assets/app.js       navigation, search, quizzes
 assets/dictionary.js  dictionary word list and UI (add words to the DATA block)
 assets/practice.js  practice trainer (uses the dictionary and the topic exercises)
+assets/store.js     shared storage for notes and comments (localStorage)
+assets/notes.js     topic notes, section comments and the My Notes page
 ```
 
 To add a topic, add a `<section class="topic" id="…" data-title="…" data-level="…" data-group="…" data-desc="…">` to `index.html`; navigation, the home page card and prev/next links are generated automatically. Exercises use `<input data-answer="answer|alternative">` inside a `<div class="quiz">`.

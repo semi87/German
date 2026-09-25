@@ -722,6 +722,16 @@ Na klar!|Sure! / Of course!` }
       btn.addEventListener("click", function () { speak(e.de); });
       td.appendChild(btn);
     }
+    if (store) {
+      var cb = document.createElement("button");
+      cb.type = "button";
+      cb.className = "speak word-comment-btn" + (store.has(commentKey(e)) ? " has-comment" : "");
+      cb.title = "My comment on this word";
+      cb.setAttribute("aria-label", "Comment on " + e.de);
+      cb.textContent = "💬";
+      cb.addEventListener("click", function () { toggleEditor(e, td.parentNode); });
+      td.appendChild(cb);
+    }
     if (e.forms) {
       var inline = document.createElement("small");
       inline.className = "forms-inline";
@@ -731,10 +741,101 @@ Na klar!|Sure! / Of course!` }
     return td;
   }
 
+  // ---------- Personal comments on words (stored via store.js) ----------
+  var store = window.NotesStore || null;
+  var COMMENTED = "💬 My comments";
+  var openWord = null;
+
+  function commentKey(e) { return "word:" + e.de; }
+  function cssEscape(v) { return window.CSS && CSS.escape ? CSS.escape(v) : v.replace(/["\\]/g, "\\$&"); }
+
+  if (store) {
+    var cChip = document.createElement("button");
+    cChip.type = "button";
+    cChip.className = "chip filter commented-chip";
+    cChip.textContent = COMMENTED;
+    cChip.addEventListener("click", function () {
+      theme = COMMENTED;
+      chipsEl.querySelectorAll(".filter").forEach(function (c) { c.classList.toggle("on", c === cChip); });
+      render();
+    });
+    chipsEl.insertBefore(cChip, chipsEl.children[1] || null);
+  }
+
+  function toggleEditor(e, tr, focus) {
+    var next = tr.nextElementSibling;
+    if (next && next.classList.contains("comment-row")) {
+      next.remove();
+      render();
+      return;
+    }
+    var key = commentKey(e);
+    var row = document.createElement("tr");
+    row.className = "comment-row";
+    var td = document.createElement("td");
+    td.colSpan = 3;
+    var label = document.createElement("div");
+    label.className = "sec-comment-label";
+    label.textContent = "💬 My comment on “" + e.de + "”";
+    var ta = document.createElement("textarea");
+    ta.className = "note-text compact";
+    ta.placeholder = "A memory trick, an example sentence, where you heard it…";
+    ta.value = store.get(key);
+    ta.setAttribute("aria-label", "Comment on " + e.de);
+    var meta = document.createElement("div");
+    meta.className = "note-meta";
+    meta.textContent = store.ok() ? "Saved automatically in this browser." : "⚠ Comments can't be saved in this browser.";
+    var timer;
+    ta.addEventListener("input", function () {
+      meta.textContent = "Saving…";
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        store.set(key, ta.value);
+        meta.textContent = store.ok() ? "Saved ✓" : "⚠ Comments can't be saved in this browser.";
+        var btn = tr.querySelector(".word-comment-btn");
+        if (btn) btn.classList.toggle("has-comment", store.has(key));
+      }, 400);
+    });
+    var done = document.createElement("button");
+    done.type = "button";
+    done.className = "btn secondary small";
+    done.textContent = "Done";
+    done.addEventListener("click", function () {
+      clearTimeout(timer);
+      store.set(key, ta.value);
+      row.remove();
+      render();
+    });
+    var actions = document.createElement("div");
+    actions.className = "comment-actions";
+    actions.appendChild(meta);
+    actions.appendChild(done);
+    td.appendChild(label);
+    td.appendChild(ta);
+    td.appendChild(actions);
+    row.appendChild(td);
+    tr.insertAdjacentElement("afterend", row);
+    ta.focus();
+    if (focus) row.scrollIntoView({ block: "center" });
+  }
+
+  // Used by the My Notes page to jump to a commented word.
+  window.showDictWord = function (de) {
+    theme = "All";
+    chipsEl.querySelectorAll(".filter").forEach(function (c) { c.classList.toggle("on", c.textContent === "All"); });
+    input.value = de.replace(/[.!?…]+$/, "");
+    openWord = de;
+    render();
+  };
+
   function render() {
     var q = norm(input.value.trim());
     visible = entries.filter(function (e) {
-      return (theme === "All" || e.theme === theme) && (!q || e.key.indexOf(q) !== -1);
+      var inTheme = theme === "All" || e.theme === theme ||
+        (theme === COMMENTED && store && store.has(commentKey(e)));
+      var hit = !q || e.key.indexOf(q) !== -1 ||
+        (store && store.has(commentKey(e)) && norm(store.get(commentKey(e))).indexOf(q) !== -1);
+      return inTheme && hit;
     });
     if (q) {
       // Words that start with the query come first.
@@ -746,6 +847,7 @@ Na klar!|Sure! / Of course!` }
     var frag = document.createDocumentFragment();
     visible.forEach(function (e) {
       var tr = document.createElement("tr");
+      tr.setAttribute("data-word", e.de);
       tr.appendChild(germanCell(e));
       var forms = document.createElement("td");
       forms.className = "forms";
@@ -759,6 +861,12 @@ Na klar!|Sure! / Of course!` }
         t.textContent = e.theme;
         en.appendChild(t);
       }
+      if (store && store.has(commentKey(e))) {
+        var pv = document.createElement("div");
+        pv.className = "word-comment-preview";
+        pv.textContent = "💬 " + store.get(commentKey(e));
+        en.appendChild(pv);
+      }
       tr.appendChild(en);
       frag.appendChild(tr);
     });
@@ -768,6 +876,12 @@ Na klar!|Sure! / Of course!` }
       ? entries.length + " words"
       : visible.length + " of " + entries.length + " words";
     document.getElementById("dictEmpty").hidden = visible.length > 0;
+    if (openWord) {
+      var row = tbody.querySelector('tr[data-word="' + cssEscape(openWord) + '"]');
+      var entry = visible.filter(function (x) { return x.de === openWord; })[0];
+      openWord = null;
+      if (row && entry) toggleEditor(entry, row, true);
+    }
   }
 
   input.addEventListener("input", render);
