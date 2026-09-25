@@ -417,3 +417,33 @@ kbd {
 .topic-cards .card h4 { display: flex; justify-content: space-between; gap: 8px; }
 [id] { scroll-margin-top: 72px; }
 .lvl { align-self: flex-start; }
+
+/* ---------- Dictionary ---------- */
+.toplink { display: inline-flex; align-items: center; text-decoration: none; font-weight: 600; font-size: .92rem; }
+.dict-controls { display: flex; gap: 8px; align-items: flex-start; }
+.dict-controls .search { margin: 0; flex: 1; }
+.dict-controls .btn { height: 40px; white-space: nowrap; }
+.chip.filter { cursor: pointer; font: inherit; font-size: .88rem; color: var(--text); }
+.chip.filter:hover { border-color: var(--accent); }
+.chip.filter.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.dict-table td { font-weight: 400; }
+.dict-table td:first-child { font-weight: 600; white-space: nowrap; }
+.dict-table td.forms { color: var(--muted); font-size: .9rem; }
+.theme-tag { display: inline-block; margin-left: 8px; font-size: .72rem; color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 0 7px; vertical-align: middle; }
+.speak { border: none; background: none; cursor: pointer; font-size: .85rem; padding: 0 4px; margin-left: 4px; opacity: .55; }
+.speak:hover { opacity: 1; }
+.flashcard { text-align: center; padding: 28px 20px; }
+.fc-front { font-size: 2rem; font-weight: 700; }
+.fc-back { font-size: 1.1rem; color: var(--muted); margin-top: 8px; }
+.flashcard .quiz-actions { justify-content: center; }
+@media (max-width: 860px) {
+  .toplink { display: none; }
+  .dict-table td:first-child { white-space: normal; }
+}
+[hidden] { display: none !important; }
+.forms-inline { display: none; }
+@media (max-width: 600px) {
+  .dict-table th:nth-child(2), .dict-table td.forms, .theme-tag { display: none; }
+  .forms-inline { display: block; font-weight: 400; color: var(--muted); font-size: .82rem; }
+  .dict-table td { padding: 8px 10px; }
+}

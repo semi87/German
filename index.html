@@ -17,6 +17,7 @@
     Deutsche Grammatik
   </a>
   <span class="spacer"></span>
+  <a class="icon-btn toplink" href="#dictionary">Wörterbuch</a>
   <button id="themeBtn" class="icon-btn" type="button" aria-label="Toggle dark mode">◐</button>
 </header>
 
@@ -1315,6 +1316,39 @@
   <div class="tip"><strong>um … zu vs. damit</strong>Use <b>um … zu</b> when both clauses have the same subject. With different subjects, use <b>damit</b>: <em>Ich spreche langsam, <b>damit</b> du mich verstehst.</em></div>
 </section>
 
+<!-- ================================================================ DICTIONARY -->
+<section class="topic" id="dictionary" data-title="Wörterbuch" data-group="Dictionary"
+  data-desc="German–English dictionary of everyday words with gender, plurals, verb forms and flashcards.">
+  <h1>Wörterbuch — Dictionary</h1>
+  <p class="subtitle"><span id="dictTotal"></span> everyday words, with noun gender and plural and the key forms of each verb. Search in German or English.</p>
+
+  <div id="dict">
+    <div class="dict-controls">
+      <input id="dictSearch" class="search" type="search" placeholder="Search a word… (e.g. Haus, to go, müde)" aria-label="Search the dictionary">
+      <button id="fcStart" class="btn" type="button">Flashcards</button>
+    </div>
+    <div id="dictThemes" class="chips"></div>
+
+    <div id="flashcard" class="card flashcard" hidden>
+      <div id="fcFront" class="fc-front"></div>
+      <div id="fcBack" class="fc-back" hidden></div>
+      <div class="quiz-actions">
+        <button id="fcShow" class="btn" type="button">Show answer</button>
+        <button id="fcNext" class="btn secondary" type="button">Next word</button>
+        <button id="fcSpeak" class="btn secondary" type="button" aria-label="Listen">🔊</button>
+        <button id="fcClose" class="btn secondary" type="button">Close</button>
+      </div>
+    </div>
+
+    <p class="hint"><span id="dictCount"></span> · Forms: nouns show the plural; verbs show <em>er/sie/es</em> · Präteritum · Perfekt. Gender colours: <span class="m">der</span>, <span class="f">die</span>, <span class="n">das</span>, <span class="p">die (plural)</span>.</p>
+    <div class="table-wrap"><table class="dict-table">
+      <thead><tr><th>Deutsch</th><th>Forms</th><th>English</th></tr></thead>
+      <tbody id="dictBody"></tbody>
+    </table></div>
+    <p id="dictEmpty" class="hint" hidden>No words found. Try another spelling or pick “All”.</p>
+  </div>
+</section>
+
 <footer class="site-footer">
   Deutsche Grammatik — a free, open-source reference. Found a mistake? Open an issue on
   <a href="https://github.com/semi87/German">GitHub</a>.
@@ -1323,6 +1357,7 @@
   </main>
 </div>
 
+<script src="assets/dictionary.js"></script>
 <script src="assets/app.js"></script>
 </body>
 </html>
