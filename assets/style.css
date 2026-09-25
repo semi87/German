@@ -447,3 +447,52 @@ kbd {
   .forms-inline { display: block; font-weight: 400; color: var(--muted); font-size: .82rem; }
   .dict-table td { padding: 8px 10px; }
 }
+
+/* ---------- Quiz input sizes ---------- */
+.quiz input.short { width: 4em; }
+.quiz input.wide { width: min(100%, 26em); display: block; margin-top: 6px; }
+
+/* ---------- Practice trainer ---------- */
+.trainer { text-align: center; padding: 28px 20px; }
+.tr-prompt { font-size: 1.9rem; font-weight: 700; line-height: 1.25; }
+.tr-hint { margin-top: 4px; min-height: 1.4em; }
+.tr-answer { margin: 18px 0 8px; }
+.tr-input {
+  width: min(100%, 22em);
+  padding: 10px 14px;
+  font: inherit;
+  font-size: 1.1rem;
+  text-align: center;
+  border: 1px solid var(--border);
+  border-bottom: 2px solid var(--muted);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text);
+}
+.tr-input.correct, .tr-sentence input.correct { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 12%, transparent); }
+.tr-input.wrong, .tr-sentence input.wrong { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 12%, transparent); }
+.tr-sentence { font-size: 1.15rem; line-height: 2.2; }
+.tr-sentence input {
+  width: 8em;
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  border-bottom: 2px solid var(--muted);
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+}
+.tr-sentence input.short { width: 4em; }
+.tr-sentence input.wide { width: min(100%, 24em); display: block; margin: 6px auto 0; }
+.tr-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.gender-btn { min-width: 90px; font-size: 1.1rem; background: var(--surface-2); border: 2px solid currentColor; }
+.gender-btn:hover { background: var(--surface); }
+.tr-feedback { min-height: 1.6em; font-weight: 600; }
+.tr-feedback.good { color: var(--ok); }
+.tr-feedback.bad { color: var(--bad); }
+.trainer .quiz-actions { justify-content: center; }
+.gender-btn.m { color: var(--der); }
+.gender-btn.f { color: var(--die); }
+.gender-btn.n { color: var(--das); }
+.tr-prompt:empty { display: none; }
+.tr-instruction { font-size: 1rem; font-weight: 500; color: var(--text); }

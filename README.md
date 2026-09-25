@@ -12,9 +12,10 @@ A free, compact German grammar reference, published with GitHub Pages.
 - **Sentences** — word order, negation, questions, conjunctions, relative clauses
 - **Words** — prepositions, adjective endings, comparison, numbers/time/dates
 - **Advanced** — Konjunktiv II, passive voice, infinitive with *zu*
+- **Practice Trainer** — endless random drills: der/die/das, plurals, verb forms, English → German, and a grammar mix drawn from every topic's exercises
 - **Wörterbuch** — a searchable German–English dictionary (~590 everyday words) with gender, plurals, verb forms, pronunciation and flashcards
 
-Each topic has tables, examples and an interactive exercise. The site has search (press `/`), dark mode and works on mobile.
+Each topic has tables, a “More examples” block and two sets of interactive exercises (43 in total). The site has search (press `/`), dark mode and works on mobile.
 
 ## Structure
 
@@ -25,6 +26,7 @@ index.html          all content (one <section class="topic"> per topic)
 assets/style.css    styles, light/dark theme
 assets/app.js       navigation, search, quizzes
 assets/dictionary.js  dictionary word list and UI (add words to the DATA block)
+assets/practice.js  practice trainer (uses the dictionary and the topic exercises)
 .github/workflows/pages.yml   deploys to GitHub Pages on push
 ```
 

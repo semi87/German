@@ -664,6 +664,9 @@ Na klar!|Sure! / Of course!` }
     return s.toLowerCase().replace(/ß/g, "ss").normalize("NFD").replace(/[̀-ͯ]/g, "");
   }
 
+  // Shared with the practice trainer.
+  window.WOERTERBUCH = entries;
+
   // ---------- UI ----------
   var root = document.getElementById("dict");
   if (!root) return;
