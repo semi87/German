@@ -15,7 +15,7 @@ A free, compact German grammar reference, published with GitHub Pages.
 - **Practice Trainer** — endless random drills: der/die/das, plurals, verb forms, English → German, and a grammar mix drawn from every topic's exercises
 - **Wörterbuch** — a searchable German–English dictionary (~590 everyday words) with gender, plurals, verb forms, pronunciation and flashcards
 
-Each topic has tables, a “More examples” block and two sets of interactive exercises (59 in total). The site has search (press `/`), dark mode and works on mobile.
+Each topic has tables, a “Common mistakes” block (✗ wrong → ✓ right, with the reason), a “More examples” block and interactive exercises (59 sets in total); the hardest topics also have an “In detail” step-by-step explanation. The site has search (press `/`), dark mode and works on mobile.
 
 ## Structure
 
