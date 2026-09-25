@@ -27,7 +27,6 @@ assets/style.css    styles, light/dark theme
 assets/app.js       navigation, search, quizzes
 assets/dictionary.js  dictionary word list and UI (add words to the DATA block)
 assets/practice.js  practice trainer (uses the dictionary and the topic exercises)
-.github/workflows/pages.yml   deploys to GitHub Pages on push
 ```
 
 To add a topic, add a `<section class="topic" id="…" data-title="…" data-level="…" data-group="…" data-desc="…">` to `index.html`; navigation, the home page card and prev/next links are generated automatically. Exercises use `<input data-answer="answer|alternative">` inside a `<div class="quiz">`.
@@ -36,4 +35,4 @@ Preview locally with `python3 -m http.server` and open http://localhost:8000.
 
 ## Deployment
 
-The workflow in `.github/workflows/pages.yml` publishes the site. If the first run fails at *Configure Pages*, enable Pages once in **Settings → Pages → Build and deployment → Source: GitHub Actions**, then re-run the workflow.
+GitHub Pages serves the site straight from the `master` branch (**Settings → Pages → Deploy from a branch → master / root**). Every push to `master` is live within a minute or two. `.nojekyll` makes Pages serve the files as they are.
