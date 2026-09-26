@@ -153,6 +153,30 @@
     }
   });
 
+  // ---------- Offline support & install ----------
+  if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js").then(function () {
+        return navigator.serviceWorker.ready;
+      }).then(function () {
+        var note = document.getElementById("offlineNote");
+        if (note) note.hidden = false;
+      }).catch(function () { /* offline support is optional */ });
+    });
+  }
+  var installPrompt = null;
+  var installBtn = document.getElementById("installBtn");
+  window.addEventListener("beforeinstallprompt", function (e) {
+    e.preventDefault();
+    installPrompt = e;
+    if (installBtn) installBtn.hidden = false;
+  });
+  if (installBtn) installBtn.addEventListener("click", function () {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    installPrompt.userChoice.then(function () { installPrompt = null; installBtn.hidden = true; });
+  });
+
   // ---------- Quizzes ----------
   function clean(s) {
     return s.trim().toLowerCase().replace(/\s+/g, " ").replace(/[.!?]$/, "");

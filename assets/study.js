@@ -103,6 +103,7 @@
     if (!t || t.id === "practice") return;
     P.recordQuiz(P.quizKey(quiz), e.detail.right, e.detail.total);
     var title = t.getAttribute("data-title");
+    if (t.hasAttribute("data-no-mix")) return;
     e.detail.items.forEach(function (it) {
       if (!it.hasGaps) return;
       var spec = { g: P.itemKey(it.li) };
@@ -120,9 +121,86 @@
   // ---------- home page summary ----------
   var home = document.getElementById("homeProgress");
 
+  // Next topic to study: from the level-test level upwards first, then anything left.
   function nextTopic() {
-    for (var i = 0; i < topics.length; i++) if (!P.isLearned(topics[i].id)) return topics[i];
-    return null;
+    var test = P.getMeta("levelTest");
+    var from = test && test.level ? Math.min(LEVELS.indexOf(test.level) + 1, LEVELS.length - 1) : 0;
+    var open = topics.filter(function (t) { return !P.isLearned(t.id); });
+    var preferred = open.filter(function (t) { return LEVELS.indexOf(levelOf(t)) >= from; });
+    return preferred[0] || open[0] || null;
+  }
+  function nextText() {
+    var texts = window.READING_TEXTS || [];
+    var test = P.getMeta("levelTest");
+    var lv = test && test.level ? test.level : "A1";
+    var unread = texts.filter(function (x) { return !P.isRead(x.id); });
+    return unread.filter(function (x) { return x.level >= lv; })[0] || unread[0] || null;
+  }
+
+  // ---------- today's plan ----------
+  function planItems() {
+    var c = P.todayCounts();
+    var items = [];
+    var n = nextTopic();
+    var learnedToday = P.learnedToday();
+    if (n || learnedToday) items.push({
+      icon: "📖", label: learnedToday ? "Learn a new topic" : "Learn a topic: " + n.getAttribute("data-title"),
+      done: learnedToday > 0, progress: learnedToday ? "done" : "read it, do the exercises, mark it as learned",
+      href: n ? "#" + n.id : "#progress"
+    });
+    var due = dueCards();
+    var cardsGoal = Math.min(10, due + P.newLeftToday());
+    if (cardsGoal > 0 || c.cards) items.push({
+      icon: "📚", label: "Flashcards" + (due ? " (" + due + " due)" : ""),
+      done: (c.cards || 0) >= Math.max(cardsGoal, 1) || (!due && !P.newLeftToday()),
+      progress: Math.min(c.cards || 0, 10) + " / " + Math.max(cardsGoal, 1) + " cards",
+      href: "#dictionary", onclick: startCards
+    });
+    var mistakes = P.mistakes().length;
+    if (mistakes || c.review) items.push({
+      icon: "🔁", label: "Review your mistakes",
+      done: (c.review || 0) >= Math.min(5, (c.review || 0) + mistakes),
+      progress: Math.min(c.review || 0, 5) + " / " + Math.min(5, (c.review || 0) + mistakes) + " answers",
+      href: "#practice?mode=review"
+    });
+    items.push({
+      icon: "🏋", label: "Practice 10 questions",
+      done: (c.practice || 0) >= 10, progress: Math.min(c.practice || 0, 10) + " / 10",
+      href: "#practice"
+    });
+    var text = nextText();
+    if (text || c.read) items.push({
+      icon: "📰", label: c.read ? "Read a text" : "Read: " + text.title + " (" + text.level + ")",
+      done: (c.read || 0) >= 1, progress: c.read ? "done" : "mark it as read when you finish",
+      href: text ? "#reading?text=" + text.id : "#reading"
+    });
+    return items;
+  }
+
+  function renderPlan(host) {
+    if (!host) return;
+    host.textContent = "";
+    var items = planItems();
+    var doneCount = items.filter(function (i) { return i.done; }).length;
+    var box = el("div", "card plan" + (doneCount === items.length ? " complete" : ""));
+    var head = el("div", "plan-head");
+    head.appendChild(el("b", null, "📅 Today's plan"));
+    head.appendChild(el("span", "hint", doneCount + " of " + items.length + " done"));
+    box.appendChild(head);
+    var ul = el("ul", "plan-list");
+    items.forEach(function (it) {
+      var li = el("li", "plan-item" + (it.done ? " done" : ""));
+      li.appendChild(el("span", "plan-check", it.done ? "✓" : ""));
+      var a = el("a", "plan-link", it.icon + " " + it.label);
+      a.href = it.href;
+      if (it.onclick) a.addEventListener("click", it.onclick);
+      li.appendChild(a);
+      li.appendChild(el("span", "plan-progress hint", it.progress));
+      ul.appendChild(li);
+    });
+    box.appendChild(ul);
+    if (doneCount === items.length) box.appendChild(el("p", "plan-complete", "🎉 Today's plan is complete — see you tomorrow!"));
+    host.appendChild(box);
   }
   function dueCards() {
     var words = window.WOERTERBUCH || [];
@@ -166,6 +244,7 @@
     if (mistakes) acts.appendChild(actionLink("🔁 Review " + mistakes + " mistake" + (mistakes === 1 ? "" : "s"), "#practice?mode=review"));
     var due = dueCards();
     acts.appendChild(actionLink(due ? "📚 " + due + " flashcard" + (due === 1 ? "" : "s") + " due" : "📚 Flashcards", "#dictionary", startCards));
+    if (!P.getMeta("levelTest")) acts.appendChild(actionLink("🎯 Take the level test", "#leveltest"));
     acts.appendChild(actionLink("📈 My progress", "#progress"));
     box.appendChild(acts);
     home.appendChild(box);
@@ -200,6 +279,10 @@
     tiles.appendChild(tile(String(mistakes), mistakes === 1 ? "mistake to review" : "mistakes to review", "#practice?mode=review"));
     tiles.appendChild(tile(String(srs.known), "words known · " + srs.learning + " learning", "#dictionary"));
     tiles.appendChild(tile(String(due), due === 1 ? "flashcard due" : "flashcards due", "#dictionary", startCards));
+    var test = P.getMeta("levelTest");
+    tiles.appendChild(tile(test ? (test.level || "A1") : "🎯", test ? "level test result" : "take the level test", "#leveltest"));
+    var texts = window.READING_TEXTS || [];
+    tiles.appendChild(tile(P.readCount() + " / " + texts.length, "texts read", "#reading"));
 
     var nextBox = document.getElementById("pgNext");
     nextBox.textContent = "";
@@ -275,6 +358,8 @@
     refreshNav();
     refreshHome();
     refreshPage();
+    renderPlan(document.getElementById("homePlan"));
+    renderPlan(document.getElementById("pgPlan"));
   }
   var pending = false;
   P.onChange(function () {
@@ -284,7 +369,7 @@
   });
   window.addEventListener("hashchange", function () {
     var id = location.hash.slice(1).split("?")[0];
-    if (id === "progress" || id === "home" || id === "") { refreshHome(); refreshPage(); }
+    if (id === "progress" || id === "home" || id === "") refreshAll();
   });
   refreshAll();
 })();

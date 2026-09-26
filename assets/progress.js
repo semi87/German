@@ -22,7 +22,7 @@ window.Progress = (function () {
   var listeners = [];
 
   function empty() {
-    return { learned: {}, quiz: {}, practice: { answered: 0, right: 0, bestStreak: 0 }, days: {}, mistakes: {}, srs: {}, newCards: { date: "", count: 0 } };
+    return { learned: {}, quiz: {}, practice: { answered: 0, right: 0, bestStreak: 0 }, days: {}, mistakes: {}, srs: {}, newCards: { date: "", count: 0 }, daily: {}, meta: {} };
   }
   function read() {
     data = empty();
@@ -55,9 +55,16 @@ window.Progress = (function () {
   function mistakeId(mode, spec) {
     return mode + "|" + JSON.stringify(spec);
   }
-  function markDay() {
+  function markDay(what) {
     var t = today();
     data.days[t] = (data.days[t] || 0) + 1;
+    if (what) {
+      var d = data.daily[t] || (data.daily[t] = {});
+      d[what] = (d[what] || 0) + 1;
+    }
+    // keep only the last 60 days of daily counters
+    var keys = Object.keys(data.daily).sort();
+    while (keys.length > 60) delete data.daily[keys.shift()];
   }
 
   read();
@@ -77,25 +84,29 @@ window.Progress = (function () {
       if (on) data.learned[id] = Date.now(); else delete data.learned[id];
       write("learned");
     },
-    learnedIds: function () { return Object.keys(data.learned); },
+    learnedToday: function () {
+      var start = new Date(); start.setHours(0, 0, 0, 0);
+      return Object.keys(data.learned).filter(function (k) { return k.indexOf("read:") !== 0 && data.learned[k] >= start.getTime(); }).length;
+    },
+    learnedIds: function () { return Object.keys(data.learned).filter(function (k) { return k.indexOf("read:") !== 0; }); },
 
     // ----- topic exercises -----
     recordQuiz: function (key, right, total) {
       var q = data.quiz[key];
       if (!q || right > q.best || total !== q.total) data.quiz[key] = { best: right, total: total, updated: Date.now() };
       else q.updated = Date.now();
-      markDay();
+      markDay("exercises");
       write("quiz");
     },
     quizBest: function (key) { return data.quiz[key] || null; },
 
     // ----- practice trainer -----
-    recordAnswer: function (correct, streak) {
+    recordAnswer: function (correct, streak, fromReview) {
       var p = data.practice;
       p.answered++;
       if (correct) p.right++;
       if (streak > p.bestStreak) p.bestStreak = streak;
-      markDay();
+      markDay(fromReview ? "review" : "practice");
       write("practice");
     },
     practice: function () { return data.practice; },
@@ -158,7 +169,7 @@ window.Progress = (function () {
         c.box = 0;
         c.due = Date.now(); // comes back in this session
       }
-      markDay();
+      markDay("cards");
       write("srs");
       return c;
     },
@@ -187,6 +198,22 @@ window.Progress = (function () {
       var quiz = li.closest(".quiz");
       return this.quizKey(quiz) + ":" + Array.prototype.indexOf.call(quiz.querySelectorAll("li"), li);
     },
+
+    // ----- reading texts -----
+    isRead: function (id) { return !!data.learned["read:" + id]; },
+    setRead: function (id, on) {
+      if (on && !data.learned["read:" + id]) markDay("read");
+      if (on) data.learned["read:" + id] = Date.now(); else delete data.learned["read:" + id];
+      write("learned");
+    },
+    readCount: function () { return Object.keys(data.learned).filter(function (k) { return k.indexOf("read:") === 0; }).length; },
+
+    // ----- today's activity (for the daily plan) -----
+    todayCounts: function () { return data.daily[today()] || {}; },
+
+    // ----- small settings / results (e.g. the level test) -----
+    getMeta: function (key) { return data.meta[key]; },
+    setMeta: function (key, value) { data.meta[key] = value; write("meta"); },
 
     // ----- all -----
     exportData: function () { return JSON.parse(JSON.stringify(data)); },
