@@ -105,7 +105,7 @@
 
   // ---------- Routing ----------
   function show() {
-    var id = decodeURIComponent(location.hash.slice(1)) || topics[0].id;
+    var id = decodeURIComponent(location.hash.slice(1)).split("?")[0] || topics[0].id;
     var target = document.getElementById(id);
     var topic = target && target.closest(".topic");
     if (!topic) topic = topics[0];
@@ -198,6 +198,15 @@
         if (ok) right++;
       });
       score.textContent = right + " / " + inputs.length + (right === inputs.length ? " — Sehr gut! 🎉" : "");
+      // Let progress tracking know (per question: all its gaps right?).
+      var items = Array.prototype.map.call(quiz.querySelectorAll("li"), function (li) {
+        var gaps = li.querySelectorAll("input[data-answer]");
+        return { li: li, ok: gaps.length > 0 && Array.prototype.every.call(gaps, function (g) { return g.classList.contains("correct"); }), hasGaps: gaps.length > 0 };
+      });
+      quiz.dispatchEvent(new CustomEvent("quiz:checked", {
+        bubbles: true,
+        detail: { right: right, total: inputs.length, items: items }
+      }));
     }
     checkBtn.addEventListener("click", check);
     resetBtn.addEventListener("click", function () {

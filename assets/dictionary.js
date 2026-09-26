@@ -887,15 +887,56 @@ Na klar!|Sure! / Of course!` }
   input.addEventListener("input", render);
   render();
 
-  // ---------- Flashcards ----------
+  // ---------- Flashcards (spaced repetition via progress.js) ----------
+  var P = window.Progress || null;
   var card = document.getElementById("flashcard");
   var front = document.getElementById("fcFront");
   var back = document.getElementById("fcBack");
+  var status = document.getElementById("fcStatus");
+  var showBtn = document.getElementById("fcShow");
+  var againBtn = document.getElementById("fcAgain");
+  var goodBtn = document.getElementById("fcGood");
   var current = null;
+  var queue = [];
+  var session = { done: 0, knew: 0 };
 
-  function nextCard() {
+  function shuffle(list) {
+    for (var i = list.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = list[i]; list[i] = list[j]; list[j] = t;
+    }
+    return list;
+  }
+
+  function buildQueue() {
     var pool = visible.length ? visible : entries;
-    current = pool[Math.floor(Math.random() * pool.length)];
+    if (!P) return shuffle(pool.slice());
+    var now = Date.now();
+    var due = pool.filter(function (e) { return P.isDue(e.de, now); })
+      .sort(function (a, b) { return P.card(a.de).due - P.card(b.de).due; });
+    var fresh = shuffle(pool.filter(function (e) { return !P.card(e.de); })).slice(0, P.newLeftToday());
+    return due.concat(fresh);
+  }
+
+  function describe(e) {
+    if (!P) return "";
+    var c = P.card(e.de);
+    if (!c) return "🆕 New word";
+    if (c.box === 0) return "🔁 Learning";
+    return "Review · box " + c.box + " of 6";
+  }
+
+  function updateStatus() {
+    if (!P) { status.textContent = ""; return; }
+    var s = P.srsSummary();
+    status.textContent = queue.length + " card" + (queue.length === 1 ? "" : "s") + " left in this session · " +
+      "session: " + session.knew + "/" + session.done + " known · " +
+      "overall: " + s.known + " known, " + s.learning + " learning";
+  }
+
+  function showCard() {
+    if (!queue.length) { finished(); return; }
+    current = queue[0];
     front.textContent = "";
     if (current.article) {
       var a = document.createElement("span");
@@ -904,15 +945,80 @@ Na klar!|Sure! / Of course!` }
       front.appendChild(a);
     }
     front.appendChild(document.createTextNode(current.word));
+    var tag = document.createElement("div");
+    tag.className = "fc-tag";
+    tag.textContent = describe(current);
+    front.appendChild(tag);
     back.textContent = current.en + (current.forms ? "  —  " + current.forms : "");
     back.hidden = true;
+    showBtn.hidden = false;
+    againBtn.hidden = goodBtn.hidden = true;
     card.hidden = false;
+    updateStatus();
+    showBtn.focus();
   }
 
-  document.getElementById("fcStart").addEventListener("click", nextCard);
-  document.getElementById("fcNext").addEventListener("click", nextCard);
-  document.getElementById("fcShow").addEventListener("click", function () { back.hidden = false; });
+  function finished() {
+    current = null;
+    front.textContent = session.done ? "Fertig! 🎉" : "Nothing to study right now 🎉";
+    var next = null;
+    if (P) {
+      (visible.length ? visible : entries).forEach(function (e) {
+        var c = P.card(e.de);
+        if (c && (next === null || c.due < next)) next = c.due;
+      });
+    }
+    back.hidden = false;
+    back.textContent = (session.done ? "You reviewed " + session.done + " card" + (session.done === 1 ? "" : "s") + " (" + session.knew + " known). " : "") +
+      (P && P.newLeftToday() === 0 ? "You've started all 15 new words for today. " : "") +
+      (next ? "Next review: " + new Date(next).toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "short" }) + "." : "");
+    showBtn.hidden = againBtn.hidden = goodBtn.hidden = true;
+    updateStatus();
+  }
+
+  function answer(knew) {
+    if (!current) return;
+    session.done++;
+    if (knew) session.knew++;
+    if (P) P.review(current.de, knew);
+    queue.shift();
+    if (!knew) queue.push(current); // try again later in this session
+    showCard();
+  }
+
+  function start() {
+    queue = buildQueue();
+    session = { done: 0, knew: 0 };
+    card.hidden = false;
+    showCard();
+    card.scrollIntoView({ block: "nearest" });
+  }
+
+  document.getElementById("fcStart").addEventListener("click", start);
+  showBtn.addEventListener("click", function () {
+    back.hidden = false;
+    showBtn.hidden = true;
+    againBtn.hidden = goodBtn.hidden = !P;
+    if (!P) { queue.shift(); queue.push(current); showBtn.hidden = false; }
+    (P ? goodBtn : showBtn).focus();
+  });
+  againBtn.addEventListener("click", function () { answer(false); });
+  goodBtn.addEventListener("click", function () { answer(true); });
   document.getElementById("fcSpeak").hidden = !canSpeak;
   document.getElementById("fcSpeak").addEventListener("click", function () { if (current) speak(current.de); });
   document.getElementById("fcClose").addEventListener("click", function () { card.hidden = true; });
+  card.addEventListener("keydown", function (e) {
+    if (e.target.tagName === "TEXTAREA" || e.target.tagName === "INPUT") return;
+    if (e.key === " " && !showBtn.hidden) { e.preventDefault(); showBtn.click(); }
+    else if ((e.key === "1" || e.key === "ArrowLeft") && !againBtn.hidden) againBtn.click();
+    else if ((e.key === "2" || e.key === "ArrowRight") && !goodBtn.hidden) goodBtn.click();
+  });
+
+  // Used by the progress page: start a flashcard session.
+  window.startFlashcards = function () {
+    input.value = "";
+    var all = chipsEl.querySelector(".filter");
+    if (all && theme !== "All") all.click(); else render();
+    start();
+  };
 })();

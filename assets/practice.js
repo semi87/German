@@ -32,6 +32,15 @@
     return e;
   }
 
+  var P = window.Progress || null;
+  var byDe = {};
+  words.forEach(function (w) { if (!byDe[w.de]) byDe[w.de] = w; });
+  function word(spec, list) {
+    if (!spec) return pick(list);
+    var w = byDe[spec.w];
+    return w && list.indexOf(w) !== -1 ? w : null;
+  }
+
   var nouns = words.filter(function (w) { return w.type === "noun" && w.gender !== "p"; });
   var plurals = nouns.filter(function (w) { return /^die /.test(w.forms); });
   var verbs = words.filter(function (w) { return w.type === "verb"; });
@@ -50,12 +59,16 @@
     var quiz = li.closest(".quiz");
     var intro = quiz.querySelector(":scope > .hint");
     grammar.push({
+      key: P ? P.itemKey(li) : topic.id + ":" + grammar.length,
       node: copy,
       topic: topic,
       title: quiz.querySelector("h3").textContent.replace(/^Practice( \d)?:?\s*/, ""),
       intro: intro ? intro.textContent : ""
     });
   });
+
+  var grammarByKey = {};
+  grammar.forEach(function (g) { grammarByKey[g.key] = g; });
 
   // ---------- Article tables for the case drills ----------
   var ARTICLES = {
@@ -110,17 +123,21 @@
     var words = body.split(" ");
     if (words.length < 4 || words.length > 9) return;
     var en = li.querySelector(".en");
-    sentences.push({ words: words, end: end, en: en ? en.textContent.trim() : "", topic: topic });
+    sentences.push({ key: body + end, words: words, end: end, en: en ? en.textContent.trim() : "", topic: topic });
   });
+  var sentenceByKey = {};
+  sentences.forEach(function (x) { sentenceByKey[x.key] = x; });
 
   // ---------- Modes ----------
   // Each mode returns a question: {prompt, hint, build(container) -> check() -> {ok, solution}}
   var MODES = {
     gender: {
       label: "der, die, das",
-      make: function () {
-        var w = pick(nouns);
+      make: function (spec) {
+        var w = word(spec, nouns);
+        if (!w) return null;
         return {
+          spec: { w: w.de },
           prompt: w.word,
           hint: w.en,
           buttons: ["der", "die", "das"],
@@ -132,10 +149,12 @@
     },
     plural: {
       label: "Plurals",
-      make: function () {
-        var w = pick(plurals);
+      make: function (spec) {
+        var w = word(spec, plurals);
+        if (!w) return null;
         var pl = w.forms;
         return {
+          spec: { w: w.de },
           prompt: w.de + " → die …",
           hint: "Plural of “" + w.en + "”",
           answers: [pl, pl.replace(/^die /, "")],
@@ -146,13 +165,15 @@
     },
     verbs: {
       label: "Verb forms",
-      make: function () {
-        var w = pick(verbs);
+      make: function (spec) {
+        var w = word(spec, verbs);
+        if (!w) return null;
         var forms = w.forms.split(" · ");
-        var i = Math.floor(Math.random() * 3);
+        var i = spec ? spec.i : Math.floor(Math.random() * 3);
         var names = ["Präsens: er/sie/es …", "Präteritum: er/sie/es …", "Perfekt: er/sie/es …"];
         var ans = forms[i];
         return {
+          spec: { w: w.de, i: i },
           prompt: w.word,
           hint: names[i] + "  (" + w.en + ")",
           answers: [ans, "er " + ans, "sie " + ans, "es " + ans],
@@ -163,11 +184,13 @@
     },
     translate: {
       label: "English → German",
-      make: function () {
-        var w = pick(translatable);
+      make: function (spec) {
+        var w = word(spec, translatable);
+        if (!w) return null;
         var answers = [w.de];
         if (w.article) answers.push(w.word);
         return {
+          spec: { w: w.de },
           prompt: w.en,
           hint: w.article ? "Noun — include the article (der/die/das)" : w.type === "verb" ? "Verb — give the infinitive" : "",
           answers: answers,
@@ -179,18 +202,19 @@
     },
     cases: {
       label: "Articles & cases",
-      make: function () {
-        var types = ["der", "ein", "kein", "mein"];
-        var type = pick(types);
-        var kase = pick(["N", "A", "D", "G"]);
+      make: function (spec) {
+        var type = spec ? spec.type : pick(["der", "ein", "kein", "mein"]);
+        var kase = spec ? spec.kase : pick(["N", "A", "D", "G"]);
         var w, plural;
-        if (Math.random() < 0.25 && withPlural.length) { w = pick(withPlural); plural = true; }
+        if (spec) { plural = spec.plural; w = word(spec, plural ? withPlural : nouns); if (!w) return null; }
+        else if (Math.random() < 0.25 && withPlural.length) { w = pick(withPlural); plural = true; }
         else { w = pick(nouns); plural = false; }
         var g = plural ? 3 : GENDER_INDEX[w.gender];
         if (type === "ein" && plural) type = "kein";
         var art = ARTICLES[type][kase][g];
         var noun = nounFor(w, plural, kase);
         return {
+          spec: { w: w.de, plural: plural, type: type, kase: kase },
           prompt: CASE_NAMES[kase] + ":  ___ " + noun,
           hint: type + " … · " + (plural ? "plural of " + w.de : w.de) + " (" + w.en + ")",
           answers: [art],
@@ -201,13 +225,17 @@
     },
     preps: {
       label: "Prepositions",
-      make: function () {
-        var p = pick(PREPS);
-        var w = pick(p[2] ? placeNouns : nouns.filter(function (x) { return x.theme !== "Time"; }));
+      make: function (spec) {
+        var pi = spec ? spec.p : Math.floor(Math.random() * PREPS.length);
+        var p = PREPS[pi];
+        if (!p) return null;
+        var w = word(spec, p[2] ? placeNouns : nouns.filter(function (x) { return x.theme !== "Time"; }));
+        if (!w) return null;
         var art = ARTICLES.der[p[1]][GENDER_INDEX[w.gender]];
         var noun = nounFor(w, false, p[1]);
         var contraction = { "zu dem": "zum", "zu der": "zur", "in dem": "im", "in das": "ins", "an dem": "am", "an das": "ans", "bei dem": "beim", "von dem": "vom" }[p[0] + " " + art];
         return {
+          spec: { p: pi, w: w.de },
           prompt: p[0] + " ___ " + noun,
           hint: "Type the article · " + w.de + " (" + w.en + ")" + (p[2] ? " · " + p[2] : ""),
           answers: [art].concat(contraction ? [contraction] : []),
@@ -219,27 +247,51 @@
     },
     builder: {
       label: "Sentence builder",
-      make: function () {
-        var s = pick(sentences);
-        return { builder: s };
+      make: function (spec) {
+        var s = spec ? sentenceByKey[spec.s] : pick(sentences);
+        return s ? { builder: s, spec: { s: s.key } } : null;
       }
     },
     grammar: {
       label: "Grammar mix",
-      make: function () {
-        var g = pick(grammar);
-        return { grammar: g };
+      make: function (spec) {
+        var g = spec ? grammarByKey[spec.g] : pick(grammar);
+        return g ? { grammar: g, spec: { g: g.key } } : null;
       }
     }
   };
+
+  // Review mode: questions you got wrong (here or in the topic exercises) until you get them right.
+  if (P) {
+    MODES.review = {
+      label: "🔁 My mistakes",
+      make: function () {
+        var list = P.mistakes();
+        for (var i = 0; i < list.length; i++) {
+          var m = list[i];
+          var made = MODES[m.mode] && m.mode !== "review" ? MODES[m.mode].make(m.spec) : null;
+          if (made) {
+            made.mode = m.mode;
+            made.fromReview = true;
+            made.left = list.length;
+            return made;
+          }
+          P.resolveMistake(m.mode, m.spec); // content changed; drop it
+        }
+        return { empty: true };
+      }
+    };
+  }
 
   var mode = "gender";
   var q = null;
   var answered = false;
   var stats = { right: 0, total: 0, streak: 0 };
 
+  var reviewChip = null;
   Object.keys(MODES).forEach(function (key) {
-    var b = el("button", "chip filter" + (key === mode ? " on" : ""), MODES[key].label);
+    var b = el("button", "chip filter" + (key === mode ? " on" : "") + (key === "review" ? " review-chip" : ""), MODES[key].label);
+    if (key === "review") reviewChip = b;
     b.type = "button";
     b.addEventListener("click", function () {
       mode = key;
@@ -248,6 +300,23 @@
     });
     modesEl.appendChild(b);
   });
+  function updateReviewChip() {
+    if (!reviewChip) return;
+    var n = P.mistakes().length;
+    reviewChip.textContent = MODES.review.label + (n ? " (" + n + ")" : "");
+  }
+  if (P) { P.onChange(function (what) { if (what === "mistakes" || what === "all") updateReviewChip(); }); updateReviewChip(); }
+
+  // Open a specific drill from a link like #practice?mode=review
+  function modeFromHash() {
+    var m = /[?&]mode=(\w+)/.exec(location.hash);
+    if (m && MODES[m[1]] && m[1] !== mode) {
+      mode = m[1];
+      modesEl.querySelectorAll(".filter").forEach(function (c) { c.classList.toggle("on", c.textContent.indexOf(MODES[mode].label) === 0); });
+      next();
+    }
+  }
+  window.addEventListener("hashchange", modeFromHash);
 
   function speak(text) {
     if (!("speechSynthesis" in window) || !text) return;
@@ -259,7 +328,16 @@
   }
 
   function next() {
-    q = MODES[mode].make();
+    render();
+    if (q.fromReview) {
+      var tag = el("span", "review-tag", "🔁 Mistake review · " + q.left + " left");
+      hintEl.insertBefore(tag, hintEl.firstChild);
+    }
+  }
+
+  function render() {
+    q = MODES[mode].make() || MODES[mode].make() || MODES[mode].make();
+    if (!q.mode) q.mode = mode;
     answered = false;
     promptEl.textContent = "";
     hintEl.textContent = "";
@@ -267,6 +345,13 @@
     feedbackEl.textContent = "";
     feedbackEl.className = "tr-feedback";
     checkBtn.hidden = false;
+
+    if (q.empty) {
+      checkBtn.hidden = true;
+      promptEl.textContent = "🎉 No mistakes to review";
+      hintEl.textContent = "Questions you get wrong — here or in any topic exercise — are collected here until you answer them correctly.";
+      return;
+    }
 
     if (q.grammar) {
       var li = q.grammar.node.cloneNode(true);
@@ -407,8 +492,18 @@
     answered = true;
     stats.total++;
     if (ok) { stats.right++; stats.streak++; } else { stats.streak = 0; }
+    if (P) {
+      P.recordAnswer(ok, stats.streak);
+      if (!ok) {
+        var label = q.grammar ? q.grammar.topic.getAttribute("data-title") : q.builder ? q.builder.en : q.prompt;
+        P.addMistake(q.mode, q.spec, label);
+      } else if (P.resolveMistake(q.mode, q.spec)) {
+        note += " · removed from your mistakes";
+      }
+    }
     feedbackEl.className = "tr-feedback " + (ok ? "good" : "bad");
-    feedbackEl.textContent = (ok ? "✓ Richtig! " : "✗ Correct answer: ") + q.solution + (ok ? note : "");
+    feedbackEl.textContent = (ok ? "✓ Richtig! " : "✗ Correct answer: ") + q.solution + (ok ? note : "") +
+      (!ok && P ? " · saved to 🔁 My mistakes" : "");
     if (q.speak) {
       var s = el("button", "speak", "🔊");
       s.type = "button";
@@ -431,4 +526,5 @@
   });
 
   next();
+  modeFromHash();
 })();

@@ -15,7 +15,7 @@
   if (!store) return;
 
   var GENERAL = "_general";
-  var SKIP = { home: true, notes: true };
+  var SKIP = { home: true, notes: true, progress: true };
 
   // ---------- Helpers ----------
   function el(tag, cls, text) {
@@ -424,7 +424,8 @@
 
   document.getElementById("notesBackup").addEventListener("click", function () {
     download("german-notes-backup.json", "application/json",
-      JSON.stringify({ app: "deutsche-grammatik", version: 1, exported: Date.now(), notes: store.all() }, null, 2));
+      JSON.stringify({ app: "deutsche-grammatik", version: 1, exported: Date.now(), notes: store.all(),
+        progress: window.Progress ? window.Progress.exportData() : undefined }, null, 2));
   });
 
   var fileInput = document.getElementById("notesFile");
@@ -438,6 +439,7 @@
         var data = JSON.parse(reader.result);
         if (!data || !data.notes || typeof data.notes !== "object") throw new Error("bad file");
         var changed = store.merge(data.notes);
+        if (data.progress && window.Progress) window.Progress.importData(data.progress);
         Object.keys(panels).forEach(function (id) { if (store.has(id)) panels[id].panel.open = true; });
         toast(changed ? "Restored " + changed + " note" + (changed === 1 ? "" : "s") + " ✓" : "Nothing new to restore");
       } catch (e) {
