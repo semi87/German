@@ -53,7 +53,7 @@
   document.querySelectorAll(".topic .quiz li").forEach(function (li) {
     if (!li.querySelector("input[data-answer]")) return;
     var topic = li.closest(".topic");
-    if (topic.id === "practice" || topic.id === "reading") return;
+    if (topic.id === "practice" || topic.hasAttribute("data-no-mix")) return;
     var copy = li.cloneNode(true);
     copy.querySelectorAll(".sol").forEach(function (s) { s.remove(); });
     var quiz = li.closest(".quiz");
@@ -127,6 +127,70 @@
   });
   var sentenceByKey = {};
   sentences.forEach(function (x) { sentenceByKey[x.key] = x; });
+
+  // ---------- Conjugation tables ----------
+  var PERSONS = ["ich", "du", "er/sie/es", "wir", "ihr", "sie/Sie"];
+  var TENSES = ["Präsens", "Präteritum", "Perfekt"];
+  var IRREGULAR_PRESENT = {
+    sein: ["bin", "bist", "ist", "sind", "seid", "sind"],
+    haben: ["habe", "hast", "hat", "haben", "habt", "haben"],
+    werden: ["werde", "wirst", "wird", "werden", "werdet", "werden"],
+    wissen: ["weiß", "weißt", "weiß", "wissen", "wisst", "wissen"],
+    tun: ["tue", "tust", "tut", "tun", "tut", "tun"],
+    "können": ["kann", "kannst", "kann", "können", "könnt", "können"],
+    "müssen": ["muss", "musst", "muss", "müssen", "müsst", "müssen"],
+    "dürfen": ["darf", "darfst", "darf", "dürfen", "dürft", "dürfen"],
+    sollen: ["soll", "sollst", "soll", "sollen", "sollt", "sollen"],
+    wollen: ["will", "willst", "will", "wollen", "wollt", "wollen"],
+    "mögen": ["mag", "magst", "mag", "mögen", "mögt", "mögen"]
+  };
+  var AUX = {
+    hat: ["habe", "hast", "hat", "haben", "habt", "haben"],
+    ist: ["bin", "bist", "ist", "sind", "seid", "sind"]
+  };
+  // "e" before -st / -t when the stem ends in t, d or consonant + m/n (arbeiten, finden, öffnen)
+  function needsE(stem) { return /[td]$/.test(stem) || /[^aeiouäöülrhmn][mn]$/.test(stem); }
+  function sibilant(stem) { return /(s|ß|z|x)$/.test(stem); }
+
+  function conjugate(w, tense) {
+    if (w.type !== "verb" || /^sich /.test(w.de)) return null;
+    var f = w.forms.split(" · ");
+    var erParts = f[0].split(" ");               // "kommt an" → ["kommt", "an"]
+    var particle = erParts.length > 1 ? " " + erParts.slice(1).join(" ") : "";
+    var inf = particle ? w.de.slice(particle.trim().length) : w.de;
+    if (tense === 0) {
+      var irr = IRREGULAR_PRESENT[inf];
+      if (irr) return irr.map(function (x) { return x + particle; });
+      var stem = inf.replace(/e?n$/, "");
+      var er = erParts[0];
+      var erStem = er.replace(/t$/, "");
+      var du = sibilant(erStem) ? er : (needsE(stem) && er === stem + "et" ? stem + "est" : erStem + "st");
+      var ihr = needsE(stem) ? stem + "et" : stem + "t";
+      return [stem + "e", du, er, inf, ihr, inf].map(function (x) { return x + particle; });
+    }
+    if (tense === 1) {
+      var pParts = f[1].split(" ");
+      var p = pParts[0];
+      var part = pParts.length > 1 ? " " + pParts.slice(1).join(" ") : "";
+      var weak = /te$/.test(p);
+      var duP = weak ? p + "st" : (/[td]$/.test(p) || /(s|ß|z|x|sch)$/.test(p) ? p + "est" : p + "st");
+      var ihrP = weak ? p + "t" : (/[td]$/.test(p) ? p + "et" : p + "t");
+      var wirP = /e$/.test(p) ? p + "n" : p + "en";
+      return [p, duP, p, wirP, ihrP, wirP].map(function (x) { return x + part; });
+    }
+    var perf = f[2].split(" ");
+    var aux = AUX[perf[0]];
+    if (!aux) return null;
+    var rest = " " + perf.slice(1).join(" ");
+    return aux.map(function (a) { return a + rest; });
+  }
+  var conjVerbs = verbs.filter(function (w) { return conjugate(w, 0); });
+  window.__conjugate = conjugate; // for testing
+
+  var canSpeakHere = "speechSynthesis" in window;
+  function normSentence(x) {
+    return x.toLowerCase().replace(/[.,!?;:„“"”–—-]/g, " ").replace(/\s+/g, " ").trim();
+  }
 
   // ---------- Modes ----------
   // Each mode returns a question: {prompt, hint, build(container) -> check() -> {ok, solution}}
@@ -252,6 +316,40 @@
         return s ? { builder: s, spec: { s: s.key } } : null;
       }
     },
+    conj: {
+      label: "Conjugation",
+      make: function (spec) {
+        var w = word(spec, conjVerbs);
+        if (!w) return null;
+        var t = spec ? spec.t : Math.floor(Math.random() * 3);
+        var forms = conjugate(w, t);
+        if (!forms) return null;
+        return {
+          spec: { w: w.de, t: t },
+          conj: { forms: forms, verb: w },
+          prompt: w.de,
+          hint: TENSES[t] + " · " + w.en,
+          solution: PERSONS.map(function (pp, i) { return pp.replace("/sie/es", "") + " " + forms[i]; }).join(" · ")
+        };
+      }
+    },
+    listen: {
+      label: "🎧 Listening",
+      make: function (spec) {
+        var s2 = spec ? sentenceByKey[spec.s] : pick(sentences);
+        return s2 ? { listen: s2, spec: { s: s2.key }, prompt: "🎧 " + (s2.en || s2.key) } : null;
+      }
+    },
+    challenge: {
+      label: "⏱ 60-second challenge",
+      make: function () {
+        if (!challenge.running) return { challengeScreen: true };
+        var kind = pick(["gender", "gender", "cases", "preps", "plural"]);
+        var made = MODES[kind].make();
+        if (made) made.mode = kind;
+        return made;
+      }
+    },
     grammar: {
       label: "Grammar mix",
       make: function (spec) {
@@ -260,6 +358,9 @@
       }
     }
   };
+
+  if (!canSpeakHere) delete MODES.listen;
+  var challenge = { running: false, score: 0, answered: 0, end: 0, timer: null, last: null };
 
   // Review mode: questions you got wrong (here or in the topic exercises) until you get them right.
   if (P) {
@@ -294,6 +395,7 @@
     if (key === "review") reviewChip = b;
     b.type = "button";
     b.addEventListener("click", function () {
+      if (challenge.running && key !== "challenge") { clearInterval(challenge.timer); challenge.running = false; }
       mode = key;
       modesEl.querySelectorAll(".filter").forEach(function (c) { c.classList.toggle("on", c === b); });
       next();
@@ -317,6 +419,15 @@
     }
   }
   window.addEventListener("hashchange", modeFromHash);
+
+  function speakRate(text, rate) {
+    if (!canSpeakHere) return;
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = "de-DE";
+    u.rate = rate;
+    window.speechSynthesis.speak(u);
+  }
 
   function speak(text) {
     if (!("speechSynthesis" in window) || !text) return;
@@ -345,6 +456,74 @@
     feedbackEl.textContent = "";
     feedbackEl.className = "tr-feedback";
     checkBtn.hidden = false;
+
+    if (q.challengeScreen) {
+      checkBtn.hidden = true;
+      var best = P ? P.getMeta("challengeBest") || 0 : 0;
+      promptEl.textContent = challenge.last ? "⏱ Time's up!" : "⏱ 60-second challenge";
+      hintEl.textContent = challenge.last
+        ? "You got " + challenge.last.score + " right out of " + challenge.last.answered + "." + (challenge.last.record ? " 🏆 New record!" : " Your best: " + best + ".")
+        : "Answer as many questions as you can in 60 seconds: der/die/das, plurals, articles and prepositions." + (best ? " Your best: " + best + "." : "");
+      var go = el("button", "btn", challenge.last ? "Play again" : "Start");
+      go.type = "button";
+      go.addEventListener("click", startChallenge);
+      answerEl.appendChild(go);
+      go.focus();
+      return;
+    }
+
+    if (q.conj) {
+      promptEl.textContent = q.prompt;
+      hintEl.textContent = q.hint;
+      var grid = el("div", "conj-grid");
+      q.inputs = [];
+      PERSONS.forEach(function (pp, i) {
+        var lab = el("label", "conj-row");
+        lab.appendChild(el("span", "conj-person", pp));
+        var inp = el("input", "tr-input conj-input");
+        inp.type = "text";
+        inp.setAttribute("autocomplete", "off");
+        inp.setAttribute("autocapitalize", "off");
+        inp.setAttribute("spellcheck", "false");
+        inp.addEventListener("keydown", function (e) {
+          if (e.key !== "Enter") return;
+          e.preventDefault();
+          if (answered) { next(); return; }
+          if (i < PERSONS.length - 1 && !q.inputs[i + 1].value) q.inputs[i + 1].focus(); else grade();
+        });
+        lab.appendChild(inp);
+        grid.appendChild(lab);
+        q.inputs.push(inp);
+      });
+      answerEl.appendChild(grid);
+      q.inputs[0].focus();
+      return;
+    }
+
+    if (q.listen) {
+      promptEl.textContent = "🎧 Listen and type what you hear";
+      hintEl.textContent = "Punctuation and capital letters don't matter.";
+      var ctl = el("div", "tr-buttons");
+      var play = el("button", "btn", "🔊 Play");
+      play.type = "button";
+      play.addEventListener("click", function () { speakRate(q.listen.words.join(" ") + q.listen.end, 0.9); input2.focus(); });
+      var slow = el("button", "btn secondary", "🐢 Slowly");
+      slow.type = "button";
+      slow.addEventListener("click", function () { speakRate(q.listen.words.join(" ") + q.listen.end, 0.6); input2.focus(); });
+      ctl.appendChild(play);
+      ctl.appendChild(slow);
+      answerEl.appendChild(ctl);
+      var input2 = el("input", "tr-input tr-wide");
+      input2.type = "text";
+      input2.setAttribute("autocomplete", "off");
+      input2.setAttribute("spellcheck", "false");
+      input2.setAttribute("aria-label", "What you heard");
+      input2.addEventListener("keydown", onEnter);
+      answerEl.appendChild(input2);
+      setTimeout(function () { if (mode === "listen" && !answered) speakRate(q.listen.words.join(" ") + q.listen.end, 0.9); }, 250);
+      input2.focus();
+      return;
+    }
 
     if (q.empty) {
       checkBtn.hidden = true;
@@ -457,7 +636,24 @@
   function grade(choice) {
     var ok;
     var note = "";
-    if (q.builder) {
+    if (q.conj) {
+      ok = true;
+      q.inputs.forEach(function (inp, i) {
+        var good = clean(inp.value) === clean(q.conj.forms[i]);
+        inp.classList.toggle("correct", good);
+        inp.classList.toggle("wrong", !good);
+        if (!good) { ok = false; inp.title = q.conj.forms[i]; }
+      });
+      q.speak = q.conj.forms.map(function (f, i) { return ["ich", "du", "er", "wir", "ihr", "sie"][i] + " " + f; }).join(", ");
+    } else if (q.listen) {
+      var heard = q.listen.words.join(" ") + q.listen.end;
+      var typed = answerEl.querySelector("input");
+      ok = normSentence(typed.value) === normSentence(heard);
+      typed.classList.toggle("correct", ok);
+      typed.classList.toggle("wrong", !ok);
+      q.solution = heard + (q.listen.en ? " — “" + q.listen.en + "”" : "");
+      q.speak = heard;
+    } else if (q.builder) {
       var target = q.builder.words.join(" ");
       var built = q.built.map(function (i) { return q.builder.words[i]; }).join(" ");
       ok = built === target;
@@ -515,6 +711,35 @@
     scoreEl.textContent = stats.right + " / " + stats.total + " correct" +
       (stats.streak >= 3 ? " · 🔥 " + stats.streak + " in a row" : "");
     nextBtn.focus();
+    if (mode === "challenge" && challenge.running) {
+      challenge.answered++;
+      if (ok) challenge.score++;
+      updateChallengeClock();
+      setTimeout(function () { if (challenge.running && answered) next(); }, ok ? 450 : 1300);
+    }
+  }
+
+  // ---------- 60-second challenge ----------
+  function updateChallengeClock() {
+    var left = Math.max(0, Math.ceil((challenge.end - Date.now()) / 1000));
+    scoreEl.textContent = "⏱ " + left + "s · " + challenge.score + " correct";
+    if (left <= 0) stopChallenge();
+  }
+  function startChallenge() {
+    challenge = { running: true, score: 0, answered: 0, end: Date.now() + 60000, timer: null, last: null };
+    challenge.timer = setInterval(updateChallengeClock, 250);
+    next();
+    updateChallengeClock();
+  }
+  function stopChallenge() {
+    if (!challenge.running) return;
+    clearInterval(challenge.timer);
+    challenge.running = false;
+    var best = P ? P.getMeta("challengeBest") || 0 : 0;
+    var record = challenge.score > best;
+    if (record && P) P.setMeta("challengeBest", challenge.score);
+    challenge.last = { score: challenge.score, answered: challenge.answered, record: record };
+    if (mode === "challenge") next();
   }
 
   checkBtn.addEventListener("click", function () { if (!answered) grade(); });

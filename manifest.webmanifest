@@ -1,0 +1,15 @@
+{
+  "name": "Deutsche Grammatik",
+  "short_name": "Grammatik",
+  "description": "German grammar, reading, practice and flashcards from A1 to B2 — works offline.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f6f2",
+  "theme_color": "#c8102e",
+  "lang": "en",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

@@ -6,6 +6,11 @@
   <title>Deutsche Grammatik</title>
   <meta name="description" content="A clear, free reference for German grammar: articles, cases, verbs, tenses, word order, adjective endings and more — with tables, examples and practice exercises.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 2'%3E%3Crect width='3' height='2' fill='%23ffce00'/%3E%3Crect width='3' height='1.333' fill='%23dd0000'/%3E%3Crect width='3' height='.667' fill='%23000'/%3E%3C/svg%3E">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#c8102e">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Grammatik">
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -4418,7 +4423,7 @@
 </section>
 
 <!-- ================================================================ READING -->
-<section class="topic" id="reading" data-title="Reading Texts" data-group="Reading"
+<section class="topic" id="reading" data-title="Reading Texts" data-group="Real-life German" data-no-mix
   data-desc="Short texts from A1 to B2 — tap any word for its meaning, see the grammar in context, check your understanding.">
   <h1>📰 Reading Texts</h1>
   <p class="subtitle">Real-life texts from A1 to B2: tap any word for its meaning, switch on the grammar highlights, and check your understanding with a few questions.</p>
@@ -4427,6 +4432,16 @@
     <div id="readingList" class="grid reading-list"></div>
   </div>
   <div id="readingTexts"></div>
+</section>
+
+<!-- ================================================================ SITUATIONS -->
+<section class="topic" id="situations" data-title="Everyday Situations" data-group="Real-life German" data-no-mix
+  data-desc="Phrases, model dialogues and practice for real life: doctor, shopping, flat hunting, job interview, phone calls, emails.">
+  <h1>💬 Everyday Situations</h1>
+  <p class="subtitle">The phrases you need in real life — with a model dialogue you can listen to and a short exercise for each situation.</p>
+  <p id="sitIntro" class="hint">Choose a situation:</p>
+  <div id="sitList" class="grid sit-list"></div>
+  <div id="sitPanels"></div>
 </section>
 
 <!-- ================================================================ PRACTICE -->
@@ -4458,6 +4473,9 @@
     <div class="card"><h4>Articles &amp; cases</h4><p>der / ein / kein / mein in all four cases, with real nouns — singular and plural.</p></div>
     <div class="card"><h4>Prepositions</h4><p>Which article after <em>mit, für, wegen, in (Wo? / Wohin?)</em> …?</p></div>
     <div class="card"><h4>Sentence builder</h4><p>Click the words into the right order. Hundreds of real example sentences from the site.</p></div>
+    <div class="card"><h4>Conjugation</h4><p>Fill in all six persons of 100+ verbs in Präsens, Präteritum or Perfekt.</p></div>
+    <div class="card"><h4>🎧 Listening</h4><p>Hear a sentence (normal or slow) and type what you hear.</p></div>
+    <div class="card"><h4>⏱ 60-second challenge</h4><p>As many right answers as you can in one minute — beat your record.</p></div>
     <div class="card"><h4>Grammar mix</h4><p>Random questions from the exercises in every grammar topic.</p></div>
   </div>
 </section>
@@ -4559,6 +4577,8 @@
 </section>
 
 <footer class="site-footer">
+  <button id="installBtn" class="btn secondary small install-btn" type="button" hidden>📲 Install as app</button>
+  <span id="offlineNote" class="hint" hidden>✓ Available offline</span><br>
   Deutsche Grammatik — a free, open-source reference. Found a mistake? Open an issue on
   <a href="https://github.com/semi87/German">GitHub</a>.
 </footer>
@@ -4570,6 +4590,7 @@
 <script src="assets/progress.js"></script>
 <script src="assets/dictionary.js"></script>
 <script src="assets/reading.js"></script>
+<script src="assets/situations.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/practice.js"></script>
 <script src="assets/leveltest.js"></script>

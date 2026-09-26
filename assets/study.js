@@ -103,7 +103,7 @@
     if (!t || t.id === "practice") return;
     P.recordQuiz(P.quizKey(quiz), e.detail.right, e.detail.total);
     var title = t.getAttribute("data-title");
-    if (t.id === "reading") return;
+    if (t.hasAttribute("data-no-mix")) return;
     e.detail.items.forEach(function (it) {
       if (!it.hasGaps) return;
       var spec = { g: P.itemKey(it.li) };
