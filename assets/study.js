@@ -277,7 +277,7 @@
     tiles.appendChild(tile(pr.answered ? Math.round(100 * pr.right / pr.answered) + "%" : "–",
       pr.answered + " practice answers · best streak " + pr.bestStreak, "#practice"));
     tiles.appendChild(tile(String(mistakes), mistakes === 1 ? "mistake to review" : "mistakes to review", "#practice?mode=review"));
-    tiles.appendChild(tile(String(srs.known), "words known · " + srs.learning + " learning", "#dictionary"));
+    tiles.appendChild(tile(String(srs.known), "words known · " + srs.learning + " learning", "#vocab"));
     tiles.appendChild(tile(String(due), due === 1 ? "flashcard due" : "flashcards due", "#dictionary", startCards));
     var test = P.getMeta("levelTest");
     tiles.appendChild(tile(test ? (test.level || "A1") : "🎯", test ? "level test result" : "take the level test", "#leveltest"));

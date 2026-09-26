@@ -7,6 +7,9 @@
  *   mistakes   questions to review until correct     { "<id>": { mode, spec, label, added, misses } }
  *   srs        flashcard schedule per word           { "<German word>": { box, due, reviews } }
  *   newCards   new flashcards started today          { date, count }
+ *   words      answers per dictionary word           { "<German word>": { seen, right, wrong, first, last } }
+ *              (flashcards and the word drills of the Practice Trainer)
+ *   vocabDays  vocabulary answers per day            { "YYYY-MM-DD": { right, wrong } }
  */
 window.Progress = (function () {
   "use strict";
@@ -22,7 +25,7 @@ window.Progress = (function () {
   var listeners = [];
 
   function empty() {
-    return { learned: {}, quiz: {}, practice: { answered: 0, right: 0, bestStreak: 0 }, days: {}, mistakes: {}, srs: {}, newCards: { date: "", count: 0 }, daily: {}, meta: {} };
+    return { learned: {}, quiz: {}, practice: { answered: 0, right: 0, bestStreak: 0 }, days: {}, mistakes: {}, srs: {}, newCards: { date: "", count: 0 }, daily: {}, meta: {}, words: {}, vocabDays: {} };
   }
   function read() {
     data = empty();
@@ -65,6 +68,20 @@ window.Progress = (function () {
     // keep only the last 60 days of daily counters
     var keys = Object.keys(data.daily).sort();
     while (keys.length > 60) delete data.daily[keys.shift()];
+  }
+
+  function countWord(word, correct) {
+    var now = Date.now();
+    var w = data.words[word] || (data.words[word] = { seen: 0, right: 0, wrong: 0, first: now, last: 0 });
+    w.seen++;
+    if (correct) w.right++; else w.wrong++;
+    w.last = now;
+    var t = today();
+    var d = data.vocabDays[t] || (data.vocabDays[t] = { right: 0, wrong: 0 });
+    if (correct) d.right++; else d.wrong++;
+    var keys = Object.keys(data.vocabDays).sort();
+    while (keys.length > 90) delete data.vocabDays[keys.shift()];
+    return w;
   }
 
   read();
@@ -162,6 +179,7 @@ window.Progress = (function () {
         data.newCards.count++;
       }
       c.reviews++;
+      countWord(word, knew);
       if (knew) {
         c.box = Math.min(c.box + 1, INTERVALS.length - 1);
         c.due = Date.now() + INTERVALS[c.box] * DAY;
@@ -187,6 +205,33 @@ window.Progress = (function () {
       return s;
     },
     intervalDays: function (box) { return INTERVALS[box] || 0; },
+
+    // ----- statistics per word -----
+    // An answer outside the flashcard schedule (a word drill, or extra flashcard practice).
+    recordWord: function (word, correct) {
+      countWord(word, correct);
+      markDay("words");
+      write("words");
+    },
+    wordStats: function (word) { return data.words[word] || null; },
+    allWordStats: function () { return data.words; },
+    // A word is difficult when at least 2 answers and under 60% of them were right.
+    isDifficult: function (word) {
+      var w = data.words[word];
+      return !!w && w.seen >= 2 && w.right / w.seen < 0.6;
+    },
+    // Right / wrong vocabulary answers for each of the last n days (oldest first).
+    vocabDays: function (n) {
+      var out = [];
+      for (var i = n - 1; i >= 0; i--) {
+        var d = new Date();
+        d.setDate(d.getDate() - i);
+        var k = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+        var v = data.vocabDays[k] || { right: 0, wrong: 0 };
+        out.push({ date: k, right: v.right, wrong: v.wrong });
+      }
+      return out;
+    },
 
     // ----- stable ids for topic exercises -----
     // "<topic id>:<n-th exercise in the topic>" and "<…>:<n-th question>"

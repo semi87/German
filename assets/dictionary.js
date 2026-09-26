@@ -162,6 +162,20 @@
     });
     chipsEl.insertBefore(cChip, chipsEl.children[1] || null);
   }
+  var DIFFICULT = "🎯 Difficult words";
+  if (window.Progress) {
+    var dChip = document.createElement("button");
+    dChip.type = "button";
+    dChip.className = "chip filter difficult-chip";
+    dChip.textContent = DIFFICULT;
+    dChip.title = "Words you answered right less than 60% of the time";
+    dChip.addEventListener("click", function () {
+      theme = DIFFICULT;
+      chipsEl.querySelectorAll(".filter").forEach(function (c) { c.classList.toggle("on", c === dChip); });
+      render();
+    });
+    chipsEl.insertBefore(dChip, chipsEl.children[1] || null);
+  }
 
   function toggleEditor(e, tr, focus) {
     var next = tr.nextElementSibling;
@@ -231,6 +245,21 @@
     render();
   };
 
+  // Small badge: flashcard box and share of right answers for words you've trained.
+  function statBadge(e) {
+    var P0 = window.Progress;
+    if (!P0) return null;
+    var st = P0.wordStats(e.de), c = P0.card(e.de);
+    if (!st && !c) return null;
+    var pct = st && st.seen ? Math.round(100 * st.right / st.seen) : null;
+    var b = document.createElement("span");
+    b.className = "wstat " + (c && c.box >= 3 ? "known" : P0.isDifficult(e.de) ? "hard" : "learning");
+    b.textContent = (c ? "▮".repeat(c.box) + "▯".repeat(6 - c.box) + " " : "") + (pct !== null ? pct + "%" : "");
+    b.title = (c ? "Flashcard box " + c.box + " of 6" + (c.box ? " · next review " + new Date(c.due).toLocaleDateString() : "") : "Not in flashcards yet") +
+      (st ? " · " + st.right + " right, " + st.wrong + " wrong" : "");
+    return b;
+  }
+
   function exampleEl(e) {
     var d = document.createElement("div");
     d.className = "word-example";
@@ -260,7 +289,8 @@
     var q = norm(input.value.trim());
     visible = entries.filter(function (e) {
       var inTheme = theme === "All" || e.theme === theme ||
-        (theme === COMMENTED && store && store.has(commentKey(e)));
+        (theme === COMMENTED && store && store.has(commentKey(e))) ||
+        (theme === DIFFICULT && window.Progress && window.Progress.isDifficult(e.de));
       var hit = !q || e.key.indexOf(q) !== -1 ||
         (store && store.has(commentKey(e)) && norm(store.get(commentKey(e))).indexOf(q) !== -1);
       return inTheme && hit && (!level || e.level === level);
@@ -295,6 +325,8 @@
         t.textContent = e.theme;
         en.appendChild(t);
       }
+      var badge = statBadge(e);
+      if (badge) en.insertBefore(badge, en.firstChild);
       if (e.exDe) en.appendChild(exampleEl(e));
       if (store && store.has(commentKey(e))) {
         var pv = document.createElement("div");
@@ -321,6 +353,15 @@
 
   input.addEventListener("input", render);
   render();
+  // Refresh the badges after training — at once if the dictionary is open, otherwise when it's next shown.
+  var statsDirty = false;
+  if (window.Progress) window.Progress.onChange(function (what) {
+    if (what !== "all" && what !== "srs" && what !== "words") return;
+    if (root.closest(".topic").classList.contains("active") && card.hidden) render(); else statsDirty = true;
+  });
+  window.addEventListener("hashchange", function () {
+    if (statsDirty && /^#dictionary/.test(location.hash)) { statsDirty = false; render(); }
+  });
 
   // ---------- Flashcards (spaced repetition via progress.js) ----------
   var P = window.Progress || null;
@@ -334,6 +375,8 @@
   var current = null;
   var queue = [];
   var session = { done: 0, knew: 0 };
+  var extra = false;      // practising words that aren't due (e.g. difficult words)
+  var customPool = null;  // a list of words chosen on the My Vocabulary page
 
   function shuffle(list) {
     for (var i = list.length - 1; i > 0; i--) {
@@ -344,8 +387,9 @@
   }
 
   function buildQueue() {
-    var pool = visible.length ? visible : entries;
-    if (!P) return shuffle(pool.slice());
+    var pool = customPool || (visible.length ? visible : entries);
+    extra = !!customPool || theme === DIFFICULT;
+    if (!P || extra) return shuffle(pool.slice());
     var now = Date.now();
     var due = pool.filter(function (e) { return P.isDue(e.de, now); })
       .sort(function (a, b) { return P.card(a.de).due - P.card(b.de).due; });
@@ -421,7 +465,11 @@
     if (!current) return;
     session.done++;
     if (knew) session.knew++;
-    if (P) P.review(current.de, knew);
+    if (P) {
+      // Words that aren't due (extra practice) only move back when you don't know them.
+      if (extra && knew && P.card(current.de) && !P.isDue(current.de)) P.recordWord(current.de, true);
+      else P.review(current.de, knew);
+    }
     queue.shift();
     if (!knew) queue.push(current); // try again later in this session
     showCard();
@@ -435,7 +483,7 @@
     card.scrollIntoView({ block: "nearest" });
   }
 
-  document.getElementById("fcStart").addEventListener("click", start);
+  document.getElementById("fcStart").addEventListener("click", function () { customPool = null; start(); });
   showBtn.addEventListener("click", function () {
     back.hidden = false;
     showBtn.hidden = true;
@@ -447,7 +495,11 @@
   goodBtn.addEventListener("click", function () { answer(true); });
   document.getElementById("fcSpeak").hidden = !canSpeak;
   document.getElementById("fcSpeak").addEventListener("click", function () { if (current) speak(current.de); });
-  document.getElementById("fcClose").addEventListener("click", function () { card.hidden = true; });
+  document.getElementById("fcClose").addEventListener("click", function () {
+    card.hidden = true;
+    customPool = null;
+    if (statsDirty) { statsDirty = false; render(); }
+  });
   card.addEventListener("keydown", function (e) {
     if (e.target.tagName === "TEXTAREA" || e.target.tagName === "INPUT") return;
     if (e.key === " " && !showBtn.hidden) { e.preventDefault(); showBtn.click(); }
@@ -455,8 +507,19 @@
     else if ((e.key === "2" || e.key === "ArrowRight") && !goodBtn.hidden) goodBtn.click();
   });
 
+  // Used by the My Vocabulary page: practise a chosen list of words (not only the due ones).
+  window.trainWords = function (list) {
+    var set = {};
+    list.forEach(function (de) { set[de] = true; });
+    customPool = entries.filter(function (e) { return set[e.de]; });
+    if (!customPool.length) { customPool = null; return; }
+    location.hash = "#dictionary";
+    setTimeout(start, 50);
+  };
+
   // Used by the progress page: start a flashcard session.
   window.startFlashcards = function () {
+    customPool = null;
     input.value = "";
     var all = chipsEl.querySelector(".filter");
     if (all && theme !== "All") all.click(); else render();

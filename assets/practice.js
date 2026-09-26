@@ -191,6 +191,7 @@
   var conjVerbs = verbs.filter(function (w) { return conjugate(w, 0); });
   window.__conjugate = conjugate; // for testing
 
+  var WORD_MODES = { gender: true, plural: true, verbs: true, translate: true, conj: true };
   var canSpeakHere = "speechSynthesis" in window;
   function normSentence(x) {
     return x.toLowerCase().replace(/[.,!?;:„“"”–—-]/g, " ").replace(/\s+/g, " ").trim();
@@ -797,6 +798,8 @@
     if (ok) { stats.right++; stats.streak++; } else { stats.streak = 0; }
     if (P) {
       P.recordAnswer(ok, stats.streak, !!q.fromReview);
+      // Word drills also count in the statistics per dictionary word.
+      if (WORD_MODES[q.mode] && q.spec && byDe[q.spec.w]) P.recordWord(q.spec.w, ok);
       if (q.speakSent) {
         // Speech recognition is not reliable enough to count as a mistake.
       } else if (!ok) {

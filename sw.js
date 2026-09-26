@@ -4,7 +4,7 @@
  * and served from the cache when there is no connection.
  * Bump VERSION when the list of files changes.
  */
-var VERSION = "dg-v2";
+var VERSION = "dg-v3";
 var FILES = [
   "./",
   "index.html",
@@ -22,6 +22,7 @@ var FILES = [
   "assets/leveltest.js",
   "assets/notes.js",
   "assets/study.js",
+  "assets/vocab.js",
   "icons/icon-192.png",
   "icons/icon-512.png",
   "icons/icon-180.png"

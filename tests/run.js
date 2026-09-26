@@ -215,6 +215,60 @@ function check(name, ok, detail) {
     check("speaking mode grades a (mocked) recognised sentence", /100%/.test(fb), fb);
     await sPage.close();
 
+    console.log("Vocabulary statistics");
+    var vPage = await browser.newPage();
+    watch(vPage);
+    await vPage.goto(base + "#dictionary");
+    await vPage.evaluate(function () { localStorage.clear(); });
+    await vPage.reload();
+    await vPage.click("#fcStart");
+    var first = await vPage.evaluate(function () { return document.getElementById("fcFront").firstChild.textContent + document.getElementById("fcFront").childNodes[1].textContent; });
+    await vPage.click("#fcShow");
+    await vPage.click("#fcAgain");
+    for (var r = 0; r < 3; r++) { await vPage.click("#fcShow"); await vPage.click("#fcGood"); }
+    await vPage.click("#fcClose");
+    var fcStats = await vPage.evaluate(function () {
+      var all = window.Progress.allWordStats();
+      var n = 0, right = 0, wrong = 0;
+      Object.keys(all).forEach(function (k) { n++; right += all[k].right; wrong += all[k].wrong; });
+      return { n: n, right: right, wrong: wrong, badges: document.querySelectorAll("#dictBody .wstat").length };
+    });
+    check("flashcard answers are counted per word", fcStats.right + fcStats.wrong === 4 && fcStats.wrong === 1, JSON.stringify(fcStats) + " first card: " + first);
+    check("the dictionary shows a badge on trained words", fcStats.badges === fcStats.n && fcStats.n > 0, JSON.stringify(fcStats));
+
+    await vPage.goto(base + "#practice?mode=gender");
+    await vPage.waitForTimeout(100);
+    var drillWord = await vPage.evaluate(function () { return document.getElementById("trPrompt").textContent; });
+    await vPage.click("#trAnswer .gender-btn >> nth=0");
+    var drill = await vPage.evaluate(function (w) {
+      var all = window.Progress.allWordStats();
+      return Object.keys(all).filter(function (k) { return k.slice(k.indexOf(" ") + 1) === w; }).map(function (k) { return all[k].seen; });
+    }, drillWord);
+    check("der/die/das drill answers are counted per word", drill.length === 1 && drill[0] >= 1, drillWord + " → " + JSON.stringify(drill));
+
+    await vPage.evaluate(function () {
+      var P = window.Progress;
+      P.recordWord("der Tisch", false); P.recordWord("der Tisch", false); P.recordWord("der Tisch", true);
+      P.recordWord("die Lampe", true); P.recordWord("die Lampe", true);
+    });
+    await vPage.goto(base + "#vocab");
+    await vPage.waitForTimeout(100);
+    var vc = await vPage.evaluate(function () {
+      var rows = document.querySelectorAll("#vcBody tr").length;
+      var expected = Object.keys(window.Progress.allWordStats()).length;
+      Array.prototype.filter.call(document.querySelectorAll("#vcFilters .filter"), function (b) { return /Difficult/.test(b.textContent); })[0].click();
+      var hard = Array.prototype.map.call(document.querySelectorAll("#vcBody tr td:first-child"), function (td) { return td.firstChild.textContent + td.childNodes[1].textContent; });
+      return { rows: rows, expected: expected, hard: hard, bars: document.querySelectorAll("#vcChart .vc-day").length };
+    });
+    check("My Vocabulary lists every trained word", vc.rows === vc.expected && vc.rows >= fcStats.n + 2, JSON.stringify(vc));
+    check("the difficult filter shows words under 60%", vc.hard.length === 1 && vc.hard[0] === "der Tisch", JSON.stringify(vc.hard));
+    check("the chart shows 14 days", vc.bars === 14);
+    await vPage.click("#vcTrain");
+    await vPage.waitForFunction(function () { return /Tisch/.test(document.getElementById("fcFront").textContent); }, null, { timeout: 3000 }).catch(function () {});
+    var trainFront = await vPage.textContent("#fcFront");
+    check("“Train these words” starts flashcards with the difficult words", /Tisch/.test(trainFront), trainFront);
+    await vPage.close();
+
     console.log("Console");
     check("no JavaScript errors", !errors.length, errors.join("\n"));
   } catch (e) {
