@@ -18,8 +18,9 @@ A free, compact German grammar reference, published with GitHub Pages.
 - **Everyday Situations** — 8 real-life situations (doctor, shopping, asking the way, phone calls, flat hunting, the authorities, job interview, emails & letters): key phrases with audio, a model dialogue with translation, and an exercise
 - **My Progress** — a daily plan (topic, flashcards, mistakes, practice, reading — ticked off automatically), mark topics as learned (✓ in the menu), best score per exercise, progress per level (A1–B2), study streak, and a “continue with” suggestion; also summarised on the home page
 - **Practice Trainer** — 🔁 *My mistakes* review (wrong answers from the trainer and from every topic exercise come back until answered correctly), plus endless random drills: der/die/das, plurals, verb forms, English → German, articles & cases, prepositions, a sentence builder (click the words into order), conjugation tables, 🎧 listening/dictation, 🎤 speaking (read a sentence aloud; speech recognition highlights the words it understood — Chrome, Edge, Safari), a ⏱ 60-second challenge with a saved record, and a grammar mix drawn from every topic's exercises
+- **My Vocabulary** — statistics for every word you've trained (flashcards and the word drills of the Practice Trainer): times practised, right / wrong, accuracy, flashcard box, last practised and next review; sort and filter (🎯 difficult, due now, learning, known), a 14-day chart, the flashcard boxes, and “Train these words” for any filtered list
 - **My Notes** — personal notes on every topic (select text → “+ Add to notes”), 💬 comments on any section heading or dictionary word, your writing drafts, a general notebook, search, export as .txt, backup/restore as .json; saved in the browser (localStorage)
-- **Wörterbuch** — a searchable German–English dictionary of ~1,000 words, each tagged A1–B2 with an example sentence and translation, filterable by theme and level, with gender, plurals, verb forms, pronunciation and spaced-repetition flashcards (Leitner boxes: 1, 3, 7, 14, 30, 60 days; 15 new words a day)
+- **Wörterbuch** — a searchable German–English dictionary of ~1,000 words, each tagged A1–B2 with an example sentence and translation, filterable by theme and level, with gender, plurals, verb forms, pronunciation and spaced-repetition flashcards (Leitner boxes: 1, 3, 7, 14, 30, 60 days; 15 new words a day), a box / accuracy badge on every word you've trained and a 🎯 *Difficult words* filter
 
 Each topic has tables, a “Common mistakes” block (✗ wrong → ✓ right, with the reason), a “More examples” block and interactive exercises (89 sets in total, including reading texts and situations); the hardest topics also have an “In detail” step-by-step explanation. The site has search (press `/`), dark mode, works on mobile, works offline and can be installed as an app (manifest + service worker).
 
@@ -37,6 +38,7 @@ assets/practice.js  practice trainer (uses the dictionary and the topic exercise
 assets/store.js     shared storage for notes and comments (localStorage)
 assets/progress.js  learning progress store: learned topics, scores, mistakes, flashcard schedule
 assets/study.js     progress UI: learned buttons, daily plan, home summary, My Progress page
+assets/vocab.js     My Vocabulary: statistics per word
 assets/reading.js   reading texts, word pop-ups and their questions
 assets/leveltest.js the level test
 assets/situations.js everyday situations (phrases, dialogues, exercises)

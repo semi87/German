@@ -4552,6 +4552,49 @@
   <p class="hint">Your progress is included in the <a href="#notes">My Notes</a> backup file, so you can move it to another device together with your notes.</p>
 </section>
 
+<!-- ================================================================ VOCABULARY STATS -->
+<section class="topic" id="vocab" data-title="My Vocabulary" data-group="My Study"
+  data-desc="Statistics for every word you've trained: right and wrong answers, accuracy, flashcard box and next review.">
+  <h1>🧠 My Vocabulary</h1>
+  <p class="subtitle">Statistics for every word you've trained with the flashcards and the word drills of the Practice Trainer — saved in this browser.</p>
+
+  <div id="vcTiles" class="pg-tiles"></div>
+
+  <h2>Last 14 days</h2>
+  <div id="vcChart" class="vc-chart" role="img"></div>
+  <p class="hint vc-legend"><span class="vc-key right"></span> right <span class="vc-key wrong"></span> wrong</p>
+
+  <h2>Flashcard boxes</h2>
+  <p class="hint">A word moves up one box each time you know it and goes back to box 0 when you don't. Box 3 and higher counts as known.</p>
+  <div id="vcBoxes" class="vc-boxes"></div>
+
+  <h2>Every word you've trained</h2>
+  <div class="dict-controls">
+    <input id="vcSearch" class="search" type="search" placeholder="Search your words…" autocomplete="off" aria-label="Search your words">
+    <select id="vcSort" aria-label="Sort by">
+      <option value="hard">Hardest first</option>
+      <option value="wrong">Most wrong answers</option>
+      <option value="due">Next review</option>
+      <option value="recent">Recently practised</option>
+      <option value="seen">Most practised</option>
+      <option value="box">Box (low to high)</option>
+      <option value="az">A–Z</option>
+    </select>
+  </div>
+  <div id="vcFilters" class="chips"></div>
+  <div class="quiz-actions">
+    <button id="vcTrain" class="btn" type="button">📚 Train these words</button>
+    <span id="vcCount" class="hint"></span>
+  </div>
+  <div class="table-wrap">
+    <table class="vc-table">
+      <thead><tr><th>Word</th><th>Box</th><th>Right / wrong</th><th>Accuracy</th><th class="vc-col-date">Last practised</th><th class="vc-col-date">Next review</th></tr></thead>
+      <tbody id="vcBody"></tbody>
+    </table>
+  </div>
+  <p id="vcEmpty" class="hint" hidden></p>
+</section>
+
 <!-- ================================================================ NOTES -->
 <section class="topic" id="notes" data-title="My Notes" data-group="My Study"
   data-desc="Your personal notebook: notes on every topic, saved in your browser, with export and backup.">
@@ -4609,5 +4652,6 @@
 <script src="assets/leveltest.js"></script>
 <script src="assets/notes.js"></script>
 <script src="assets/study.js"></script>
+<script src="assets/vocab.js"></script>
 </body>
 </html>

@@ -892,3 +892,46 @@ a.pg-tile:hover { border-color: var(--accent); }
 .sp-mic.on { animation: sp-pulse 1.2s ease-in-out infinite; }
 @keyframes sp-pulse { 50% { opacity: .65; } }
 .sp-heard { margin-top: 10px; min-height: 1.2em; }
+
+/* ---------- Word statistics ---------- */
+.wstat { display: inline-block; margin-right: 6px; font-size: .72rem; font-family: ui-monospace, monospace; letter-spacing: -1px; padding: 0 5px; border-radius: 6px; border: 1px solid var(--border); vertical-align: 1px; white-space: nowrap; }
+.wstat.known { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 50%, transparent); }
+.wstat.hard { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 50%, transparent); }
+.wstat.learning { color: var(--muted); }
+
+/* ---------- My Vocabulary ---------- */
+button.pg-tile { font: inherit; cursor: pointer; border: 1px solid var(--border); }
+button.pg-tile:hover { border-color: var(--accent); }
+.vc-chart { display: flex; align-items: stretch; gap: 4px; height: 150px; padding: 8px 0; }
+.vc-day { flex: 1; display: flex; flex-direction: column; align-items: center; min-width: 0; }
+.vc-num { font-size: .7rem; color: var(--muted); height: 1.1em; }
+.vc-bar-wrap { flex: 1; width: 100%; display: flex; align-items: flex-end; justify-content: center; }
+.vc-bar { width: 70%; max-width: 28px; background: var(--ok); border-radius: 4px 4px 0 0; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+.vc-wrong { background: var(--bad); width: 100%; }
+.vc-date { font-size: .7rem; color: var(--muted); margin-top: 4px; white-space: nowrap; }
+.vc-legend { display: flex; align-items: center; gap: 6px; }
+.vc-key { display: inline-block; width: 12px; height: 12px; border-radius: 3px; }
+.vc-key.right { background: var(--ok); }
+.vc-key.wrong { background: var(--bad); margin-left: 10px; }
+.vc-boxes { display: grid; gap: 6px; max-width: 560px; }
+.vc-box-row { display: grid; grid-template-columns: 9em 1fr 3em; align-items: center; gap: 10px; font-size: .9rem; }
+.vc-box-count { text-align: right; font-weight: 600; }
+.vc-fill-known { background: var(--ok) !important; }
+.vc-fill-learning { background: var(--accent) !important; }
+.vc-fill-hard { background: var(--bad) !important; }
+#vcSort { flex: none; max-width: 45%; height: 40px; font: inherit; padding: 8px 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--card, transparent); color: var(--text); }
+.vc-table td { vertical-align: top; }
+.vc-en { display: block; color: var(--muted); }
+.vc-lvl { margin: 0 0 0 6px; }
+.vc-box { font-family: ui-monospace, monospace; letter-spacing: -1px; white-space: nowrap; color: var(--muted); }
+.vc-rw { white-space: nowrap; }
+.vc-acc { min-width: 90px; }
+.vc-acc-bar { height: 6px; margin: 6px 0 2px; }
+.vc-pct { font-size: .85rem; }
+.vc-pct.hard { color: var(--bad); font-weight: 600; }
+.vc-col-date { white-space: nowrap; font-size: .88rem; color: var(--muted); }
+.vc-due { color: var(--accent); font-weight: 600; }
+@media (max-width: 640px) {
+  .vc-col-date { display: none; }
+  .vc-box-row { grid-template-columns: 7.5em 1fr 2.5em; }
+}

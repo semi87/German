@@ -15,7 +15,7 @@
   if (!store) return;
 
   var GENERAL = "_general";
-  var SKIP = { home: true, notes: true, progress: true };
+  var SKIP = { home: true, notes: true, progress: true, vocab: true };
 
   // ---------- Helpers ----------
   function el(tag, cls, text) {
