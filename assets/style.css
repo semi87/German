@@ -743,3 +743,83 @@ a.pg-tile:hover { border-color: var(--accent); }
 .fc-good { background: var(--ok); }
 .fc-again { color: var(--bad); }
 .fc-help { margin: 14px 0 0; }
+
+/* ---------- Reading texts ---------- */
+.reading-card { text-decoration: none; color: var(--text); }
+.reading-card:hover { border-color: var(--accent); }
+.reading-card.done { border-left: 4px solid var(--ok); }
+.reading-card h4 { display: flex; justify-content: space-between; gap: 8px; margin: 0 0 6px; }
+.reading-card p { margin: 0 0 6px; color: var(--muted); font-size: .92rem; }
+.reader-back { display: inline-block; margin-bottom: 8px; text-decoration: none; font-weight: 600; }
+.reader-head { display: flex; align-items: center; gap: 10px; }
+.reader-title { margin: 0; border: none; padding: 0; font-size: 1.5rem; }
+.reader-tools { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 4px; }
+.reader-tools .chip { cursor: pointer; font: inherit; font-size: .9rem; color: var(--text); }
+.reader-help { margin: 4px 0 12px; }
+.reading-text {
+  font-size: 1.12rem;
+  line-height: 1.85;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  box-shadow: var(--shadow);
+}
+.reading-text p { margin: 0 0 12px; }
+.reading-text p:last-child { margin-bottom: 0; }
+.reading-text .w { cursor: pointer; border-radius: 3px; }
+.reading-text .w:hover { background: var(--surface-2); text-decoration: underline dotted; }
+.reading-text .w.active { background: var(--accent-soft); color: var(--accent); }
+.reading-text.show-grammar .gr { background: color-mix(in srgb, var(--gold) 22%, transparent); border-bottom: 2px solid var(--gold); border-radius: 3px; }
+.reading-translation { margin: 12px 0; padding: 14px 18px; border-left: 4px solid var(--border); color: var(--muted); }
+.reading-translation p { margin: 0 0 10px; }
+.reader-grammar { margin: 16px 0; font-size: .95rem; }
+.quiz input.tf { width: 6.5em; }
+.word-pop {
+  position: absolute;
+  z-index: 35;
+  max-width: min(320px, calc(100vw - 16px));
+  padding: 10px 12px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+  font-size: .95rem;
+}
+.word-pop-head { display: flex; align-items: center; gap: 6px; font-size: 1.05rem; }
+.word-pop-en { margin: 4px 0; }
+.word-pop-gr, .word-pop-dict { display: block; font-size: .88rem; margin-top: 4px; text-decoration: none; }
+
+/* ---------- Level test ---------- */
+.leveltest { padding: 22px; }
+.lt-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.lt-sentence { font-size: 1.35rem; font-weight: 600; margin: 22px 0 16px; line-height: 1.5; }
+.lt-gap { color: var(--accent); letter-spacing: .1em; }
+.lt-options { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; }
+.lt-option { min-width: 120px; font-size: 1.02rem; color: var(--text); }
+.lt-option:hover { border-color: var(--accent); }
+.lt-skip { color: var(--muted); font-weight: 400; }
+.lt-result { text-align: center; margin: 6px 0 16px; }
+.lt-level { font-size: 2.2rem; font-weight: 800; color: var(--accent); }
+.pg-fill.low { background: var(--gold); }
+
+/* ---------- Today's plan ---------- */
+.plan { margin: 0 0 12px; border-left: 4px solid var(--accent); }
+.plan.complete { border-left-color: var(--ok); }
+.plan-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+.plan-list { list-style: none; margin: 0; padding: 0; }
+.plan-item { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-top: 1px solid var(--border); flex-wrap: wrap; }
+.plan-check {
+  width: 20px; height: 20px; flex-shrink: 0;
+  border: 2px solid var(--border); border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: .75rem; font-weight: 800; color: #fff;
+}
+.plan-item.done .plan-check { background: var(--ok); border-color: var(--ok); }
+.plan-item.done .plan-link { color: var(--muted); text-decoration: line-through; }
+.plan-link { font-weight: 600; text-decoration: none; }
+.plan-link:hover { text-decoration: underline; }
+.plan-progress { margin-left: auto; }
+.plan-complete { margin: 10px 0 0; font-weight: 600; color: var(--ok); }
+.topic .reader-title { margin: 0; border: none; padding: 0; }

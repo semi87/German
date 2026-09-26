@@ -17,6 +17,7 @@
     <span class="brand-text">Deutsche Grammatik</span>
   </a>
   <span class="spacer"></span>
+  <a class="icon-btn toplink" href="#reading">Reading</a>
   <a class="icon-btn toplink" href="#practice">Practice</a>
   <a class="icon-btn toplink" href="#dictionary">Wörterbuch</a>
   <a class="icon-btn notes-link" href="#notes" aria-label="My notes">📝<span class="notes-link-label"> Notes</span><span id="notesCount" class="notes-badge"></span></a>
@@ -38,6 +39,7 @@
     <p>A compact, practical reference for German grammar — from the alphabet to the subjunctive. Every topic has tables, real examples and a short exercise to check yourself.</p>
   </div>
 
+  <div id="homePlan"></div>
   <div id="homeProgress"></div>
 
   <h2>How to use this site</h2>
@@ -50,6 +52,14 @@
 
   <h2>All topics</h2>
   <div id="topicCards" class="grid topic-cards"></div>
+</section>
+
+<!-- ================================================================ LEVEL TEST -->
+<section class="topic" id="leveltest" data-title="Level Test" data-group="Overview"
+  data-desc="32 questions to estimate your level (A1–B2) and get a list of topics to study.">
+  <h1>🎯 Level Test</h1>
+  <p class="subtitle">Find out where you are — and what to study next.</p>
+  <div id="leveltestApp" class="card leveltest"></div>
 </section>
 
 <!-- ================================================================ ALPHABET -->
@@ -4407,6 +4417,18 @@
   </div>
 </section>
 
+<!-- ================================================================ READING -->
+<section class="topic" id="reading" data-title="Reading Texts" data-group="Reading"
+  data-desc="Short texts from A1 to B2 — tap any word for its meaning, see the grammar in context, check your understanding.">
+  <h1>📰 Reading Texts</h1>
+  <p class="subtitle">Real-life texts from A1 to B2: tap any word for its meaning, switch on the grammar highlights, and check your understanding with a few questions.</p>
+  <div id="readingIndex">
+    <div id="readingLevels" class="chips"></div>
+    <div id="readingList" class="grid reading-list"></div>
+  </div>
+  <div id="readingTexts"></div>
+</section>
+
 <!-- ================================================================ PRACTICE -->
 <section class="topic" id="practice" data-title="Practice Trainer" data-group="Practice"
   data-desc="Endless random drills: der/die/das, plurals, verb forms, translation and a mixed grammar test.">
@@ -4482,6 +4504,7 @@
   <h1>📈 My Progress</h1>
   <p class="subtitle">Everything you've learned and practised, in one place — saved in this browser.</p>
 
+  <div id="pgPlan"></div>
   <div id="pgTiles" class="pg-tiles"></div>
   <div id="pgNext" class="card pg-next"></div>
 
@@ -4546,8 +4569,10 @@
 <script src="assets/store.js"></script>
 <script src="assets/progress.js"></script>
 <script src="assets/dictionary.js"></script>
+<script src="assets/reading.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/practice.js"></script>
+<script src="assets/leveltest.js"></script>
 <script src="assets/notes.js"></script>
 <script src="assets/study.js"></script>
 </body>

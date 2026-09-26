@@ -12,12 +12,14 @@ A free, compact German grammar reference, published with GitHub Pages.
 - **Sentences** — word order, negation, questions, conjunctions, relative clauses, two-part conjunctions, the word *es*, more subordinate clauses (indem, sodass, als ob …), yes/no/doch & short answers
 - **Words** — prepositions, adjective endings, comparison, numbers/time/dates, indefinite pronouns, modal particles, *hin*/*her*, time expressions, word formation, countries & languages
 - **Advanced** — Konjunktiv II, passive voice, infinitive with *zu*, adjectives as nouns, participles as adjectives, indirect speech (Konjunktiv I), modal verbs for assumptions, passive alternatives, nominal style
-- **My Progress** — mark topics as learned (✓ in the menu), best score per exercise, progress per level (A1–B2), study streak, and a “continue with” suggestion; also summarised on the home page
+- **Level Test** — 32 multiple-choice questions (8 per level) that estimate your level (A1–B2) and recommend topics
+- **Reading Texts** — 8 original texts (2 per level, A1–B2): tap any word for its meaning, grammar highlights linked to the topics, English translation, read-aloud and comprehension questions
+- **My Progress** — a daily plan (topic, flashcards, mistakes, practice, reading — ticked off automatically), mark topics as learned (✓ in the menu), best score per exercise, progress per level (A1–B2), study streak, and a “continue with” suggestion; also summarised on the home page
 - **Practice Trainer** — 🔁 *My mistakes* review (wrong answers from the trainer and from every topic exercise come back until answered correctly), plus endless random drills: der/die/das, plurals, verb forms, English → German, articles & cases, prepositions, a sentence builder (click the words into order) and a grammar mix drawn from every topic's exercises
 - **My Notes** — personal notes on every topic (select text → “+ Add to notes”), 💬 comments on any section heading or dictionary word, a general notebook, search, export as .txt, backup/restore as .json; saved in the browser (localStorage)
 - **Wörterbuch** — a searchable German–English dictionary (~590 everyday words) with gender, plurals, verb forms, pronunciation and spaced-repetition flashcards (Leitner boxes: 1, 3, 7, 14, 30, 60 days; 15 new words a day)
 
-Each topic has tables, a “Common mistakes” block (✗ wrong → ✓ right, with the reason), a “More examples” block and interactive exercises (73 sets in total); the hardest topics also have an “In detail” step-by-step explanation. The site has search (press `/`), dark mode and works on mobile.
+Each topic has tables, a “Common mistakes” block (✗ wrong → ✓ right, with the reason), a “More examples” block and interactive exercises (81 sets in total, including the reading texts); the hardest topics also have an “In detail” step-by-step explanation. The site has search (press `/`), dark mode and works on mobile.
 
 ## Structure
 
@@ -31,7 +33,9 @@ assets/dictionary.js  dictionary word list and UI (add words to the DATA block)
 assets/practice.js  practice trainer (uses the dictionary and the topic exercises)
 assets/store.js     shared storage for notes and comments (localStorage)
 assets/progress.js  learning progress store: learned topics, scores, mistakes, flashcard schedule
-assets/study.js     progress UI: learned buttons, home summary, My Progress page
+assets/study.js     progress UI: learned buttons, daily plan, home summary, My Progress page
+assets/reading.js   reading texts, word pop-ups and their questions
+assets/leveltest.js the level test
 assets/notes.js     topic notes, section comments and the My Notes page
 ```
 

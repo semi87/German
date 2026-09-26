@@ -53,7 +53,7 @@
   document.querySelectorAll(".topic .quiz li").forEach(function (li) {
     if (!li.querySelector("input[data-answer]")) return;
     var topic = li.closest(".topic");
-    if (topic.id === "practice") return;
+    if (topic.id === "practice" || topic.id === "reading") return;
     var copy = li.cloneNode(true);
     copy.querySelectorAll(".sol").forEach(function (s) { s.remove(); });
     var quiz = li.closest(".quiz");
@@ -493,7 +493,7 @@
     stats.total++;
     if (ok) { stats.right++; stats.streak++; } else { stats.streak = 0; }
     if (P) {
-      P.recordAnswer(ok, stats.streak);
+      P.recordAnswer(ok, stats.streak, !!q.fromReview);
       if (!ok) {
         var label = q.grammar ? q.grammar.topic.getAttribute("data-title") : q.builder ? q.builder.en : q.prompt;
         P.addMistake(q.mode, q.spec, label);
