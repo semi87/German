@@ -851,3 +851,44 @@ a.pg-tile:hover { border-color: var(--accent); }
 .conj-input { width: 100%; text-align: left; font-size: 1rem; padding: 8px 12px; }
 .tr-input.tr-wide { width: min(100%, 32em); margin-top: 12px; }
 .install-btn { margin-right: 8px; }
+
+/* ---------- Dictionary levels & examples ---------- */
+.level-chips { margin-top: -4px; }
+.level-chips .chip { font-size: .8rem; padding: 3px 10px; }
+.word-lvl { margin: 0 6px 0 0; vertical-align: 1px; }
+.word-example { margin-top: 4px; font-size: .88rem; overflow-wrap: anywhere; }
+.word-example span[lang] { font-style: italic; }
+.word-example small { display: block; color: var(--muted); }
+.word-example .speak { font-size: .8rem; }
+.fc-example { margin-top: 10px; font-size: .95rem; font-style: italic; }
+
+/* ---------- Writing practice ---------- */
+.write-status { margin-top: 6px; min-height: 1em; }
+.write-task p { margin: 4px 0; }
+.write-task-de { font-weight: 600; }
+.write-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; }
+@media (max-width: 760px) { .write-grid { grid-template-columns: 1fr; } }
+.write-checklist, .write-phrases { list-style: none; padding: 0; margin: 0 0 12px; }
+.write-checklist li { display: flex; gap: 8px; padding: 4px 0; overflow-wrap: anywhere; }
+.write-mark { flex: none; width: 1.2em; text-align: center; color: var(--muted); font-weight: 700; }
+.write-checklist li.ok .write-mark { color: var(--ok); }
+.write-checklist li.ok > span:last-child > span:first-child, .write-checklist li.ok > span:last-child { color: var(--ok); }
+.write-phrases li { padding: 5px 0; border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
+.write-phrases small { display: block; }
+.write-text { width: 100%; min-height: 220px; font-size: 1rem; line-height: 1.6; box-sizing: border-box; }
+.write-bar { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 6px 0; font-size: .9rem; }
+.write-count { color: var(--muted); }
+.write-count.ok { color: var(--ok); font-weight: 600; }
+.write-count.off { color: var(--bad); }
+.write-model { margin-top: 16px; }
+.write-model-text { white-space: pre-wrap; line-height: 1.7; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; overflow-wrap: anywhere; }
+.write-model-en { margin-top: 8px; color: var(--muted); }
+
+/* ---------- Speaking practice ---------- */
+.sp-target { font-size: 1.35rem; line-height: 1.6; margin: 4px 0 12px; overflow-wrap: anywhere; }
+.sp-word { border-radius: 4px; padding: 0 2px; }
+.sp-word.hit { color: var(--ok); background: color-mix(in srgb, var(--ok) 12%, transparent); }
+.sp-word.miss { color: var(--bad); text-decoration: underline wavy; text-underline-offset: 4px; }
+.sp-mic.on { animation: sp-pulse 1.2s ease-in-out infinite; }
+@keyframes sp-pulse { 50% { opacity: .65; } }
+.sp-heard { margin-top: 10px; min-height: 1.2em; }

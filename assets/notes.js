@@ -75,6 +75,7 @@
     if (id === GENERAL) return "general";
     if (id.indexOf("sec:") === 0) return "section";
     if (id.indexOf("word:") === 0) return "word";
+    if (id.indexOf("write:") === 0) return "write";
     return "topic";
   }
   function topicTitle(tid) {
@@ -88,6 +89,9 @@
         var s = sections[id];
         return s ? topicTitle(s.topic) + " › " + s.heading : id.split(":").slice(1).join(" › ");
       case "word": return id.slice(5);
+      case "write":
+        var wt = (window.WRITING_TASKS || []).filter(function (x) { return "write:" + x.id === id; })[0];
+        return "Writing › " + (wt ? wt.de : id.slice(6));
       default: return topicTitle(id);
     }
   }
@@ -311,7 +315,8 @@
   var GROUPS = [
     { kind: "topic", title: "Topic notes" },
     { kind: "section", title: "Section comments" },
-    { kind: "word", title: "Dictionary comments" }
+    { kind: "word", title: "Dictionary comments" },
+    { kind: "write", title: "Writing practice" }
   ];
 
   function sortKey(id) {
@@ -345,6 +350,8 @@
     } else if (k === "word") {
       location.hash = "#dictionary";
       setTimeout(function () { if (window.showDictWord) window.showDictWord(id.slice(5)); }, 50);
+    } else if (k === "write") {
+      location.hash = "#writing?t=" + id.slice(6);
     }
   }
 

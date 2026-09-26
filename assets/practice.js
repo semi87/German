@@ -164,9 +164,13 @@
       var stem = inf.replace(/e?n$/, "");
       var er = erParts[0];
       var erStem = er.replace(/t$/, "");
-      var du = sibilant(erStem) ? er : (needsE(stem) && er === stem + "et" ? stem + "est" : erStem + "st");
+      var du = sibilant(erStem) ? er
+        : needsE(stem) && er === stem + "et" ? stem + "est"
+        : /t$/.test(stem) && er !== stem + "et" ? er + "st" // hält → hältst, tritt → trittst
+        : erStem + "st";
       var ihr = needsE(stem) ? stem + "et" : stem + "t";
-      return [stem + "e", du, er, inf, ihr, inf].map(function (x) { return x + particle; });
+      var ich = /el$/.test(stem) ? stem.slice(0, -2) + "le" : stem + "e"; // entwickeln → entwickle
+      return [ich, du, er, inf, ihr, inf].map(function (x) { return x + particle; });
     }
     if (tense === 1) {
       var pParts = f[1].split(" ");
@@ -340,6 +344,13 @@
         return s2 ? { listen: s2, spec: { s: s2.key }, prompt: "🎧 " + (s2.en || s2.key) } : null;
       }
     },
+    speaking: {
+      label: "🎤 Speaking",
+      make: function (spec) {
+        var s3 = spec ? sentenceByKey[spec.s] : pick(sentences);
+        return s3 ? { speakSent: s3, spec: { s: s3.key }, prompt: s3.key } : null;
+      }
+    },
     challenge: {
       label: "⏱ 60-second challenge",
       make: function () {
@@ -360,6 +371,23 @@
   };
 
   if (!canSpeakHere) delete MODES.listen;
+  var Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!Recognition) delete MODES.speaking;
+
+  // Word-level comparison of a target sentence with what the speech recognition heard.
+  function compareSpoken(target, heard) {
+    var want = normSentence(target).split(" ");
+    var got = normSentence(heard).split(" ").filter(Boolean);
+    var hits = want.map(function (w) {
+      var i = got.indexOf(w);
+      if (i === -1) return false;
+      got.splice(i, 1);
+      return true;
+    });
+    var n = hits.filter(Boolean).length;
+    return { hits: hits, pct: Math.round(100 * n / want.length) };
+  }
+  window.__compareSpoken = compareSpoken; // for testing
   var challenge = { running: false, score: 0, answered: 0, end: 0, timer: null, last: null };
 
   // Review mode: questions you got wrong (here or in the topic exercises) until you get them right.
@@ -525,6 +553,76 @@
       return;
     }
 
+    if (q.speakSent) {
+      checkBtn.hidden = true;
+      var target = q.speakSent.words.join(" ") + q.speakSent.end;
+      promptEl.textContent = "🎤 Read this sentence aloud";
+      hintEl.textContent = (q.speakSent.en ? "“" + q.speakSent.en + "” · " : "") + "Press the microphone and speak clearly. 80% of the words = passed.";
+      var sentEl = el("div", "sp-target");
+      sentEl.lang = "de";
+      q.speakSent.words.forEach(function (w, i) {
+        if (i) sentEl.appendChild(document.createTextNode(" "));
+        sentEl.appendChild(el("span", "sp-word", w));
+      });
+      sentEl.appendChild(document.createTextNode(q.speakSent.end));
+      answerEl.appendChild(sentEl);
+      var ctl2 = el("div", "tr-buttons");
+      var mic = el("button", "btn sp-mic", "🎤 Speak");
+      mic.type = "button";
+      ctl2.appendChild(mic);
+      if (canSpeakHere) {
+        var first = el("button", "btn secondary", "🔊 Listen first");
+        first.type = "button";
+        first.addEventListener("click", function () { speakRate(target, 0.85); });
+        ctl2.appendChild(first);
+      }
+      answerEl.appendChild(ctl2);
+      var heardEl = el("div", "sp-heard hint");
+      heardEl.setAttribute("aria-live", "polite");
+      answerEl.appendChild(heardEl);
+      var rec = null;
+      mic.addEventListener("click", function () {
+        if (rec) { rec.stop(); return; }
+        if (canSpeakHere) window.speechSynthesis.cancel();
+        rec = new Recognition();
+        rec.lang = "de-DE";
+        rec.interimResults = false;
+        rec.maxAlternatives = 3;
+        var got = false;
+        rec.onresult = function (ev) {
+          got = true;
+          var alts = ev.results[0], best = null;
+          for (var a = 0; a < alts.length; a++) {
+            var c = compareSpoken(target, alts[a].transcript);
+            if (!best || c.pct > best.pct) best = { pct: c.pct, hits: c.hits, text: alts[a].transcript };
+          }
+          sentEl.querySelectorAll(".sp-word").forEach(function (w, i) {
+            w.classList.toggle("hit", best.hits[i]);
+            w.classList.toggle("miss", !best.hits[i]);
+          });
+          heardEl.textContent = "I heard: “" + best.text + "”";
+          q.spoken = best;
+          grade();
+        };
+        rec.onerror = function (ev) {
+          heardEl.textContent = ev.error === "not-allowed" || ev.error === "service-not-allowed"
+            ? "⚠ Microphone access was blocked. Allow it in your browser's site settings."
+            : ev.error === "no-speech" ? "I didn't hear anything — try again." : "⚠ Speech recognition error: " + ev.error;
+        };
+        rec.onend = function () {
+          rec = null;
+          mic.classList.remove("on");
+          mic.textContent = answered ? "🎤 Try again" : "🎤 Speak";
+          if (!got && !heardEl.textContent) heardEl.textContent = "I didn't hear anything — try again.";
+        };
+        heardEl.textContent = "";
+        mic.classList.add("on");
+        mic.textContent = "⏹ Listening… (tap to stop)";
+        try { rec.start(); } catch (e) { rec = null; mic.classList.remove("on"); mic.textContent = "🎤 Speak"; }
+      });
+      return;
+    }
+
     if (q.empty) {
       checkBtn.hidden = true;
       promptEl.textContent = "🎉 No mistakes to review";
@@ -645,6 +743,15 @@
         if (!good) { ok = false; inp.title = q.conj.forms[i]; }
       });
       q.speak = q.conj.forms.map(function (f, i) { return ["ich", "du", "er", "wir", "ihr", "sie"][i] + " " + f; }).join(", ");
+    } else if (q.speakSent) {
+      ok = q.spoken.pct >= 80;
+      q.solution = q.spoken.pct + "% of the words recognised";
+      q.speak = q.speakSent.words.join(" ") + q.speakSent.end;
+      if (answered) { // a retry: update the feedback only
+        feedbackEl.className = "tr-feedback " + (ok ? "good" : "bad");
+        feedbackEl.textContent = (ok ? "✓ Sehr gut! " : "✗ ") + q.solution + (ok ? "" : " — listen and try again.");
+        return;
+      }
     } else if (q.listen) {
       var heard = q.listen.words.join(" ") + q.listen.end;
       var typed = answerEl.querySelector("input");
@@ -690,7 +797,9 @@
     if (ok) { stats.right++; stats.streak++; } else { stats.streak = 0; }
     if (P) {
       P.recordAnswer(ok, stats.streak, !!q.fromReview);
-      if (!ok) {
+      if (q.speakSent) {
+        // Speech recognition is not reliable enough to count as a mistake.
+      } else if (!ok) {
         var label = q.grammar ? q.grammar.topic.getAttribute("data-title") : q.builder ? q.builder.en : q.prompt;
         P.addMistake(q.mode, q.spec, label);
       } else if (P.resolveMistake(q.mode, q.spec)) {
@@ -698,8 +807,10 @@
       }
     }
     feedbackEl.className = "tr-feedback " + (ok ? "good" : "bad");
-    feedbackEl.textContent = (ok ? "✓ Richtig! " : "✗ Correct answer: ") + q.solution + (ok ? note : "") +
-      (!ok && P ? " · saved to 🔁 My mistakes" : "");
+    feedbackEl.textContent = q.speakSent
+      ? (ok ? "✓ Sehr gut! " : "✗ ") + q.solution + (ok ? "" : " — listen and try again.")
+      : (ok ? "✓ Richtig! " : "✗ Correct answer: ") + q.solution + (ok ? note : "") +
+        (!ok && P ? " · saved to 🔁 My mistakes" : "");
     if (q.speak) {
       var s = el("button", "speak", "🔊");
       s.type = "button";
