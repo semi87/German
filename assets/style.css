@@ -673,3 +673,25 @@ kbd {
   .sec-comment-btn, .word-comment-btn { display: none !important; }
   .sec-comment[hidden] { display: none !important; }
 }
+
+/* ---------- Sentence builder ---------- */
+.builder-line {
+  min-height: 52px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  margin: 0 auto 12px;
+  max-width: 640px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+}
+.builder-line.correct { border-color: var(--ok); border-style: solid; }
+.builder-line.wrong { border-color: var(--bad); border-style: solid; }
+.builder-end { color: var(--muted); font-weight: 700; }
+.builder-bank { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 640px; margin: 0 auto; }
+.word-chip { cursor: pointer; font: inherit; font-size: 1.02rem; padding: 6px 12px; color: var(--text); }
+.word-chip:hover { border-color: var(--accent); }
+.word-chip.placed { background: var(--accent-soft); border-color: var(--accent); }
