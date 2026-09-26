@@ -8,15 +8,15 @@ A free, compact German grammar reference, published with GitHub Pages.
 
 - **Basics** — alphabet & pronunciation, nouns & gender, articles, the four cases, Akkusativ / Dativ / Genitiv in depth, pronouns
 - **Verbs** — present tense, modal verbs, separable verbs, imperative, reflexive verbs, verbs with prepositions, *lassen*, modal verbs in the past
-- **Tenses** — Perfekt, Präteritum & Plusquamperfekt, Futur I & II, tense overview
-- **Sentences** — word order, negation, questions, conjunctions, relative clauses, two-part conjunctions, the word *es*
-- **Words** — prepositions, adjective endings, comparison, numbers/time/dates, indefinite pronouns, modal particles, *hin*/*her*, time expressions, word formation
-- **Advanced** — Konjunktiv II, passive voice, infinitive with *zu*, adjectives as nouns, participles as adjectives, indirect speech (Konjunktiv I), modal verbs for assumptions
-- **Practice Trainer** — endless random drills: der/die/das, plurals, verb forms, English → German, and a grammar mix drawn from every topic's exercises
+- **Tenses** — Perfekt, Präteritum & Plusquamperfekt, Futur I & II, tense overview, irregular verbs by pattern
+- **Sentences** — word order, negation, questions, conjunctions, relative clauses, two-part conjunctions, the word *es*, more subordinate clauses (indem, sodass, als ob …), yes/no/doch & short answers
+- **Words** — prepositions, adjective endings, comparison, numbers/time/dates, indefinite pronouns, modal particles, *hin*/*her*, time expressions, word formation, countries & languages
+- **Advanced** — Konjunktiv II, passive voice, infinitive with *zu*, adjectives as nouns, participles as adjectives, indirect speech (Konjunktiv I), modal verbs for assumptions, passive alternatives, nominal style
+- **Practice Trainer** — endless random drills: der/die/das, plurals, verb forms, English → German, articles & cases, prepositions, a sentence builder (click the words into order) and a grammar mix drawn from every topic's exercises
 - **My Notes** — personal notes on every topic (select text → “+ Add to notes”), 💬 comments on any section heading or dictionary word, a general notebook, search, export as .txt, backup/restore as .json; saved in the browser (localStorage)
 - **Wörterbuch** — a searchable German–English dictionary (~590 everyday words) with gender, plurals, verb forms, pronunciation and flashcards
 
-Each topic has tables, a “Common mistakes” block (✗ wrong → ✓ right, with the reason), a “More examples” block and interactive exercises (67 sets in total); the hardest topics also have an “In detail” step-by-step explanation. The site has search (press `/`), dark mode and works on mobile.
+Each topic has tables, a “Common mistakes” block (✗ wrong → ✓ right, with the reason), a “More examples” block and interactive exercises (73 sets in total); the hardest topics also have an “In detail” step-by-step explanation. The site has search (press `/`), dark mode and works on mobile.
 
 ## Structure
 
