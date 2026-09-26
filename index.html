@@ -38,6 +38,8 @@
     <p>A compact, practical reference for German grammar — from the alphabet to the subjunctive. Every topic has tables, real examples and a short exercise to check yourself.</p>
   </div>
 
+  <div id="homeProgress"></div>
+
   <h2>How to use this site</h2>
   <ul>
     <li>Pick a topic from the menu, or press <kbd>/</kbd> to search (e.g. <em>Dativ</em>, <em>weil</em>, <em>Perfekt</em>).</li>
@@ -4447,19 +4449,22 @@
   <div id="dict">
     <div class="dict-controls">
       <input id="dictSearch" class="search" type="search" placeholder="Search a word… (e.g. Haus, to go, müde)" aria-label="Search the dictionary">
-      <button id="fcStart" class="btn" type="button">Flashcards</button>
+      <button id="fcStart" class="btn" type="button">📚 Flashcards</button>
     </div>
     <div id="dictThemes" class="chips"></div>
 
     <div id="flashcard" class="card flashcard" hidden>
+      <div id="fcStatus" class="fc-status hint"></div>
       <div id="fcFront" class="fc-front"></div>
       <div id="fcBack" class="fc-back" hidden></div>
       <div class="quiz-actions">
         <button id="fcShow" class="btn" type="button">Show answer</button>
-        <button id="fcNext" class="btn secondary" type="button">Next word</button>
+        <button id="fcAgain" class="btn secondary fc-again" type="button" hidden>✗ Didn't know</button>
+        <button id="fcGood" class="btn fc-good" type="button" hidden>✓ Knew it</button>
         <button id="fcSpeak" class="btn secondary" type="button" aria-label="Listen">🔊</button>
         <button id="fcClose" class="btn secondary" type="button">Close</button>
       </div>
+      <p class="hint fc-help">Spaced repetition: words you know come back after 1, 3, 7, 14, 30 and 60 days; words you miss come back right away. Up to 15 new words a day. Filter by theme or search first to study just those words.</p>
     </div>
 
     <p class="hint"><span id="dictCount"></span> · Forms: nouns show the plural; verbs show <em>er/sie/es</em> · Präteritum · Perfekt. Gender colours: <span class="m">der</span>, <span class="f">die</span>, <span class="n">das</span>, <span class="p">die (plural)</span>.</p>
@@ -4471,8 +4476,32 @@
   </div>
 </section>
 
+<!-- ================================================================ PROGRESS -->
+<section class="topic" id="progress" data-title="My Progress" data-group="My Study"
+  data-desc="Topics learned, exercise scores, your study streak, mistakes to review and flashcards due.">
+  <h1>📈 My Progress</h1>
+  <p class="subtitle">Everything you've learned and practised, in one place — saved in this browser.</p>
+
+  <div id="pgTiles" class="pg-tiles"></div>
+  <div id="pgNext" class="card pg-next"></div>
+
+  <h2>By level</h2>
+  <div id="pgLevels" class="pg-levels"></div>
+
+  <h2>All topics</h2>
+  <p class="hint">Tick a topic when you feel confident with it. Scores show your best result in each exercise of the topic.</p>
+  <div id="pgTopics"></div>
+
+  <h2>Reset</h2>
+  <div class="quiz-actions">
+    <button id="pgClearMistakes" class="btn secondary" type="button">Clear my mistakes list</button>
+    <button id="pgReset" class="btn secondary danger" type="button">Reset all progress</button>
+  </div>
+  <p class="hint">Your progress is included in the <a href="#notes">My Notes</a> backup file, so you can move it to another device together with your notes.</p>
+</section>
+
 <!-- ================================================================ NOTES -->
-<section class="topic" id="notes" data-title="My Notes" data-group="My Notes"
+<section class="topic" id="notes" data-title="My Notes" data-group="My Study"
   data-desc="Your personal notebook: notes on every topic, saved in your browser, with export and backup.">
   <h1>📝 My Notes</h1>
   <p class="subtitle">Everything you've written, in one place. Notes are saved automatically <b>in this browser</b> — they stay private to you and are still here next time you visit.</p>
@@ -4503,7 +4532,7 @@
     <button id="notesClear" class="btn secondary danger" type="button">Delete all notes</button>
     <input id="notesFile" type="file" accept=".json,application/json" hidden>
   </div>
-  <p class="hint">The text file is easy to read, print or paste into another app. The backup file can be restored here — restoring adds to your current notes and never deletes anything.</p>
+  <p class="hint">The text file is easy to read, print or paste into another app. The backup file (notes, comments <b>and</b> your progress) can be restored here — restoring adds to what you have and never deletes anything.</p>
 </section>
 
 <footer class="site-footer">
@@ -4515,9 +4544,11 @@
 </div>
 
 <script src="assets/store.js"></script>
+<script src="assets/progress.js"></script>
 <script src="assets/dictionary.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/practice.js"></script>
 <script src="assets/notes.js"></script>
+<script src="assets/study.js"></script>
 </body>
 </html>
