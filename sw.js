@@ -4,7 +4,7 @@
  * and served from the cache when there is no connection.
  * Bump VERSION when the list of files changes.
  */
-var VERSION = "dg-v3";
+var VERSION = "dg-v4";
 var FILES = [
   "./",
   "index.html",

@@ -871,6 +871,38 @@ B2 folglich|consequently|Er war krank, folglich fehlte er.|He was ill, so he was
 B2 dennoch|nevertheless|Die Aufgabe war schwer, dennoch hat sie es geschafft.|The task was hard, yet she managed it.
 B2 infolgedessen|as a result|Es gab einen Unfall, infolgedessen staute sich der Verkehr.|There was an accident; as a result, traffic backed up.` });
 
+DICT_DATA.push({ theme: "Question words", type: "word", words: `
+A1 wer|who (subject)|Wer ist das?|Who is that?
+A1 wen|who(m) (accusative)|Wen besuchst du?|Who are you visiting?
+A1 wem|(to) whom (dative)|Wem gehört das Auto?|Who does the car belong to?
+A2 wessen|whose|Wessen Jacke ist das?|Whose jacket is that?
+A1 was|what|Was machst du heute?|What are you doing today?
+A1 wo|where (place)|Wo wohnst du?|Where do you live?
+A1 wohin|where to|Wohin fährst du im Urlaub?|Where are you going on holiday?
+A1 woher|where from|Woher kommen Sie?|Where are you from?
+A1 wann|when|Wann beginnt der Kurs?|When does the course start?
+A1 um wie viel Uhr|at what time|Um wie viel Uhr treffen wir uns?|What time are we meeting?
+A2 seit wann|since when, how long|Seit wann wohnst du hier?|How long have you lived here?
+A2 bis wann|until when|Bis wann hast du Zeit?|Until when are you free?
+A2 wie lange|how long|Wie lange dauert der Film?|How long is the film?
+A2 wie oft|how often|Wie oft fährt der Bus?|How often does the bus run?
+A1 warum|why|Warum lernst du Deutsch?|Why are you learning German?
+A2 wieso|why (colloquial)|Wieso hast du nicht angerufen?|Why didn't you call?
+B1 weshalb|why (more formal)|Weshalb wurde der Termin abgesagt?|Why was the appointment cancelled?
+B1 wozu|what for|Wozu brauchst du das?|What do you need that for?
+A1 wie|how|Wie geht es dir?|How are you?
+A1 wie alt|how old|Wie alt bist du?|How old are you?
+A1 wie viel|how much|Wie viel kostet das Brot?|How much is the bread?
+A1 wie viele|how many|Wie viele Leute kommen?|How many people are coming?
+A2 welcher / welche / welches|which|Welche Farbe magst du?|Which colour do you like?
+A2 was für ein|what kind of|Was für ein Auto hast du?|What kind of car do you have?
+B1 worauf|what … for / on|Worauf wartest du?|What are you waiting for?
+B1 wofür|what … for|Wofür interessierst du dich?|What are you interested in?
+B1 worüber|what … about|Worüber sprecht ihr?|What are you talking about?
+B1 woran|what … of / about|Woran denkst du?|What are you thinking about?
+B1 womit|what … with|Womit schreibst du?|What are you writing with?
+B1 wovon|what … of / from|Wovon träumst du?|What do you dream of?` });
+
 DICT_DATA.push({ theme: "Phrases", type: "word", words: `
 A1 Hallo!|Hello!
 A1 Guten Morgen!|Good morning!

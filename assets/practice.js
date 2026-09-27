@@ -128,6 +128,62 @@
   var sentenceByKey = {};
   sentences.forEach(function (x) { sentenceByKey[x.key] = x; });
 
+  // Question-word drill: [question with ___, answer, accepted question words (first = solution), English]
+  var QUESTIONS = [
+    ["___ heißt du?", "Ich heiße Lara.", "Wie", "What's your name?"],
+    ["___ kommst du?", "Aus Brasilien.", "Woher", "Where are you from?"],
+    ["___ wohnst du?", "In Frankfurt.", "Wo", "Where do you live?"],
+    ["___ fährst du am Wochenende?", "Nach Hamburg.", "Wohin", "Where are you going at the weekend?"],
+    ["___ ist das?", "Das ist mein Kollege Ben.", "Wer", "Who is that?"],
+    ["___ besuchst du heute?", "Meine Oma.", "Wen", "Who are you visiting today?"],
+    ["___ hilfst du?", "Meinem Nachbarn.", "Wem", "Who are you helping?"],
+    ["___ Tasche ist das?", "Das ist Marias Tasche.", "Wessen", "Whose bag is that?"],
+    ["___ trinkst du?", "Einen Kaffee.", "Was", "What are you drinking?"],
+    ["___ beginnt das Konzert?", "Um acht Uhr.", "Wann|Um wie viel Uhr", "When does the concert start?"],
+    ["___ lernst du Deutsch?", "Seit zwei Jahren.", "Seit wann", "How long have you been learning German?"],
+    ["___ dauert die Fahrt?", "Drei Stunden.", "Wie lange", "How long does the journey take?"],
+    ["___ gehst du schwimmen?", "Einmal pro Woche.", "Wie oft", "How often do you go swimming?"],
+    ["___ hat der Supermarkt geöffnet?", "Bis 22 Uhr.", "Bis wann|Wie lange", "Until when is the supermarket open?"],
+    ["___ bist du traurig?", "Weil mein Hund krank ist.", "Warum|Wieso|Weshalb", "Why are you sad?"],
+    ["___ brauchst du die Schere?", "Um das Papier zu schneiden.", "Wozu|Warum|Wofür", "What do you need the scissors for?"],
+    ["___ geht es dir?", "Gut, danke.", "Wie", "How are you?"],
+    ["___ ist deine Schwester?", "Sie ist 25.", "Wie alt", "How old is your sister?"],
+    ["___ ist es bis zum Strand?", "Nur 500 Meter.", "Wie weit", "How far is it to the beach?"],
+    ["___ kostet die Jacke?", "89 Euro.", "Wie viel|Was", "How much is the jacket?"],
+    ["___ Kinder haben Sie?", "Zwei Töchter.", "Wie viele", "How many children do you have?"],
+    ["___ Zucker nimmst du?", "Zwei Löffel.", "Wie viel", "How much sugar do you take?"],
+    ["___ Farbe hat dein Auto?", "Rot.", "Welche|Was für eine", "What colour is your car?"],
+    ["___ Film möchtest du sehen, den neuen oder den alten?", "Den neuen.", "Welchen", "Which film do you want to see?"],
+    ["___ Buch liest du gerade?", "Einen Krimi.", "Was für ein", "What kind of book are you reading?"],
+    ["___ Musik hörst du gern?", "Rock und Jazz.", "Was für|Welche", "What kind of music do you like?"],
+    ["___ wartest du?", "Auf den Zug.", "Worauf", "What are you waiting for?"],
+    ["___ wartest du?", "Auf meinen Bruder.", "Auf wen", "Who are you waiting for?"],
+    ["___ interessierst du dich?", "Für Fußball.", "Wofür", "What are you interested in?"],
+    ["___ sprecht ihr?", "Über das Wetter.", "Worüber", "What are you talking about?"],
+    ["___ sprecht ihr?", "Über unseren Chef.", "Über wen", "Who are you talking about?"],
+    ["___ denkst du?", "An meine Prüfung.", "Woran", "What are you thinking about?"],
+    ["___ fährst du zur Uni?", "Mit der U-Bahn.", "Womit|Wie", "How do you get to university?"],
+    ["___ fährst du in den Urlaub?", "Mit meinen Eltern.", "Mit wem", "Who are you going on holiday with?"],
+    ["___ hast du Angst?", "Vor Hunden.", "Wovor", "What are you afraid of?"],
+    ["___ freust du dich?", "Auf die Ferien.", "Worauf", "What are you looking forward to?"],
+    ["___ ist das Geschenk?", "Für meinen Vater.", "Für wen", "Who is the present for?"],
+    ["___ ist die Postkarte?", "Von meiner Freundin.", "Von wem", "Who is the postcard from?"],
+    ["___ geht es in dem Film?", "Um eine Liebesgeschichte.", "Worum", "What is the film about?"],
+    ["___ machst du beruflich?", "Ich bin Lehrerin.", "Was", "What do you do for a living?"],
+    ["___ hast du den Schlüssel gelegt?", "In die Schublade.", "Wohin", "Where did you put the key?"],
+    ["___ liegt der Schlüssel?", "In der Schublade.", "Wo", "Where is the key?"],
+    ["___ kommst du gerade?", "Von der Arbeit.", "Woher", "Where are you coming from?"],
+    ["___ hast du gestern angerufen?", "Meine Mutter.", "Wen", "Who did you call yesterday?"],
+    ["___ gehört der Hund?", "Unseren Nachbarn.", "Wem", "Who does the dog belong to?"],
+    ["___ hat den Kuchen gebacken?", "Mein Opa.", "Wer", "Who baked the cake?"],
+    ["___ spät ist es?", "Halb drei.", "Wie", "What time is it?"],
+    ["In ___ Stadt wohnst du?", "In Graz.", "welcher", "Which city do you live in?"],
+    ["Mit ___ Bus fährst du?", "Mit der Linie 5.", "welchem", "Which bus do you take?"],
+    ["___ ist das Wetter in Berlin?", "Kalt und windig.", "Wie", "What's the weather like in Berlin?"]
+  ];
+  var questionByKey = {};
+  QUESTIONS.forEach(function (x) { questionByKey[x[0] + " " + x[1]] = x; });
+
   // ---------- Conjugation tables ----------
   var PERSONS = ["ich", "du", "er/sie/es", "wir", "ihr", "sie/Sie"];
   var TENSES = ["Präsens", "Präteritum", "Perfekt"];
@@ -311,6 +367,23 @@
           solution: p[0] + " " + art + " " + noun + " — " + CASE_NAMES[p[1]] +
             (contraction ? " (= " + contraction + " " + noun + ")" : ""),
           speak: p[0] + " " + art + " " + noun
+        };
+      }
+    },
+    questions: {
+      label: "❓ Question words",
+      make: function (spec) {
+        var x = spec ? questionByKey[spec.q] : pick(QUESTIONS);
+        if (!x) return null;
+        var accepted = x[2].split("|");
+        var full = x[0].replace("___", accepted[0]);
+        return {
+          spec: { q: x[0] + " " + x[1] },
+          prompt: x[0] + "  — " + x[1],
+          hint: "Read the answer and type the missing question word.",
+          answers: accepted,
+          solution: full + " — “" + x[3] + "”" + (accepted.length > 1 ? " (also: " + accepted.slice(1).join(", ") + ")" : ""),
+          speak: full + " " + x[1]
         };
       }
     },
